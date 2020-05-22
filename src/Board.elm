@@ -15,6 +15,7 @@ import Color exposing (..)
 import Collage.Layout exposing (stack)
 import Collage.Render exposing (svg)
 import Collage.Text as Text exposing (Text, fromString, size, color, shape)
+import Dice exposing (..)
 
 ----------------------------------------------------------------------
 
@@ -32,14 +33,105 @@ main =
 
 -- MODEL
 
+type alias Spot =
+  {
+  num_pieces : Int,
+  vulnerable : Bool,
+  player : Int {-0 ,1, 2, 0 means no one occupies -}
+  }
+
+type alias Board =
+  {
+  spots : List Spot
+  }
+
+type alias Player =
+  {
+  player_num : Int,
+  beared : Bool,
+  barred : Bool
+  }
+
+type alias Bar =
+  {
+  whites : Int,
+  blacks : Int
+  }
+
+type alias Die =
+  {
+  roll1 : Int,
+  roll2 : Int,
+  sel_d1 : Bool,
+  double : Bool
+  }
+
+set_double : Int -> Int -> Bool
+set_double r1 r2 =
+  if (r1 == r2) then True
+  else False
+
+type alias Move =
+  {
+  src : Int,
+  dst : Int
+  }
+
+type alias Score =
+  {
+  p1 : Int,
+  p2 : Int,
+  doubled_val : Int,
+  dbl_p1_ctrl : Bool
+  }
+
 type alias Model =
-  { randomNumbers : List Int }
+  { randomNumbers : List Int,
+    board : Board,
+    dice : Die,
+    bar : Bar,
+    p1 : Player,
+    p2 : Player,
+    score : Score
+    }
 
 type alias Flags =
   ()
 
 initModel =
-  { randomNumbers = [] }
+  { randomNumbers = [],
+   board = {
+   spots = [{num_pieces = 2, vulnerable = False, player = 1},
+   {num_pieces = 0, vulnerable = False, player = 0}, 
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 5, vulnerable = False, player = 2},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 3, vulnerable = False, player = 2},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 5, vulnerable = False, player = 1},
+   {num_pieces = 5, vulnerable = False, player = 2},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 3, vulnerable = False, player = 1},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 5, vulnerable = False, player = 1},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 0, vulnerable = False, player = 0},
+   {num_pieces = 1, vulnerable = False, player = 2}]},
+   dice = { roll1 = (Dice.roll 1 D6), roll2 = (Dice.roll 1 D6), sel_d1 = True, double = False},
+   bar = {whites = 0, blacks = 0},
+   p1 = {player_num = 1, beared = False, barred = False},
+   p2 = {player_num = 2, beared = False, barred = False},
+   score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = True}
+  }
+  
 
 init : Flags -> (Model, Cmd Msg)
 init () =
