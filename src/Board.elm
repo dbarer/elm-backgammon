@@ -80,7 +80,37 @@ view model =
         , ("transform", "translate(-50%, -50%)")
         ]
       canvas =
-        [(Collage.square 600 |> outlined (solid thick (uniform red)))]
+        --q1
+          [Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (640, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (535, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (430, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (325, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (220, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (115, 200)]
+        --q2
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-640, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-535, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-430, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-325, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-220, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-115, 200)]
+        --q3
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-640, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-535, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-430, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-325, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-220, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-115, -200)]
+        --q4
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (640, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (535, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (430, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (325, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (220, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (115, -200)]
+        --background and bar
+        ++[Collage.rectangle 100 750|> styled (uniform brown, solid thick (uniform black))]
+        ++[Collage.rectangle 1400 750|> styled (uniform brown, solid thick (uniform black))]
 
       display =
         -- Html.text (Debug.toString (model.hitCount, model.missCount))
