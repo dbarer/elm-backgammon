@@ -86,9 +86,8 @@ type alias Score =
   }
 
 type alias Model =
-  { randomNumbers : List Int,
-    board : Board,
-    dice : Die,
+  { board : Board,
+    --dice : Die,
     bar : Bar,
     p1 : Player,
     p2 : Player,
@@ -98,40 +97,42 @@ type alias Model =
 type alias Flags =
   ()
 
-initModel =
-  { randomNumbers = [],
+initModel ={
    board = {
-   spots = [{num_pieces = 2, vulnerable = False, player = 1},
-   {num_pieces = 0, vulnerable = False, player = 0}, 
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 5, vulnerable = False, player = 2},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 3, vulnerable = False, player = 2},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 5, vulnerable = False, player = 1},
-   {num_pieces = 5, vulnerable = False, player = 2},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 3, vulnerable = False, player = 1},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 5, vulnerable = False, player = 1},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 0, vulnerable = False, player = 0},
-   {num_pieces = 1, vulnerable = False, player = 2}]},
-   dice = { roll1 = (Dice.roll 1 D6), roll2 = (Dice.roll 1 D6), sel_d1 = True, double = False},
+     spots = [
+       {num_pieces = 2, vulnerable = False, player = 1},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 5, vulnerable = False, player = 2},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 3, vulnerable = False, player = 2},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 5, vulnerable = False, player = 1},
+       {num_pieces = 5, vulnerable = False, player = 2},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 3, vulnerable = False, player = 1},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 5, vulnerable = False, player = 1},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 0, vulnerable = False, player = 0},
+       {num_pieces = 1, vulnerable = False, player = 2}
+       ]
+   },
+   --dice = { roll1 = (Dice.roll 1 D6), roll2 = (Dice.roll 1 D6), sel_d1 = True, double = False},
    bar = {whites = 0, blacks = 0},
    p1 = {player_num = 1, beared = False, barred = False},
    p2 = {player_num = 2, beared = False, barred = False},
    score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = True}
   }
-  
+
 
 init : Flags -> (Model, Cmd Msg)
 init () =
@@ -144,19 +145,16 @@ type Msg
   = MouseDown
   | EscapeKeyDown
   | OtherKeyDown
-  | RandomNumber Int
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     EscapeKeyDown ->
-      (initModel, Cmd.none)
+      (model, Cmd.none)
     OtherKeyDown ->
       (model, Cmd.none)
     MouseDown ->
-      (model, Random.generate RandomNumber (Random.int 1 10))
-    RandomNumber i ->
-      ({ randomNumbers = i :: model.randomNumbers}, Cmd.none)
+      (model, Cmd.none)
 
 
 -- VIEW
