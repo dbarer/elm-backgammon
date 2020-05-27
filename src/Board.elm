@@ -14,6 +14,7 @@ import Collage exposing (..)
 import Color exposing (..)
 import Collage.Layout exposing (stack)
 import Collage.Render exposing (svg)
+import Collage.Events exposing (onClick)
 import Collage.Text as Text exposing (Text, fromString, size, color, shape)
 import Dice exposing (..)
 
@@ -157,7 +158,7 @@ update msg model =
     MouseDown ->
       (model, Cmd.none)
     ClickedOn n ->
-      (model, Cmd.none)  
+      (model, Cmd.none)
 
 -- VIEW
 
