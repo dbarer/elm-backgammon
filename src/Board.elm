@@ -38,7 +38,7 @@ type alias Spot =
   {
   num_pieces : Int,
   vulnerable : Bool,
-  player : Int {-0 ,1, 2, 0 means no one occupies -}
+  player : Int {- 0 ,1, 2: 0 means no one occupies -}
   }
 
 type alias Board =
@@ -88,7 +88,7 @@ type alias Score =
 
 type alias Model =
   { board : Board,
-    --dice : Die,
+    dice : Die,
     bar : Bar,
     p1 : Player,
     p2 : Player,
@@ -127,7 +127,7 @@ initModel ={
        {num_pieces = 1, vulnerable = False, player = 2}
        ]
    },
-   --dice = { roll1 = (Dice.roll 1 D6), roll2 = (Dice.roll 1 D6), sel_d1 = True, double = False},
+   dice = { roll1 = (Random.int 1 6), roll2 = (Random.int 1 6), sel_d1 = True, double = False},
    bar = {whites = 0, blacks = 0},
    p1 = {player_num = 1, beared = False, barred = False},
    p2 = {player_num = 2, beared = False, barred = False},
@@ -146,10 +146,13 @@ type Msg
   = Double
   | Roll
   | ClickedOn Int
+  | Tick
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
+    Tick ->
+      (model, Cmd.none)
     Double ->
       (model, Cmd.none)
     Roll ->
@@ -216,13 +219,17 @@ keyDecoder : Decode.Decoder String
 keyDecoder =
   Decode.field "key" Decode.string
 
+
 subscriptions : Model -> Sub Msg
-subscriptions model =
-  Sub.batch
-    [ Browser.Events.onMouseDown
-        (Decode.succeed MouseDown)
-    , Browser.Events.onKeyDown
-        (Decode.map
-          (\key -> if key == "Escape" then EscapeKeyDown else OtherKeyDown)
-          keyDecoder)
-    ]
+subscriptions model = Time.every 50 (\t -> Tick)
+
+-- subscriptions : Model -> Sub Msg
+-- subscriptions model =
+--   Sub.batch
+--     [ Browser.Events.onMouseDown
+--         (Decode.succeed MouseDown)
+--     , Browser.Events.onKeyDown
+--         (Decode.map
+--           (\key -> if key == "Escape" then EscapeKeyDown else OtherKeyDown)
+--           keyDecoder)
+--     ]
