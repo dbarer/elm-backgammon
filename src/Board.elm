@@ -145,6 +145,7 @@ type Msg
   = MouseDown
   | EscapeKeyDown
   | OtherKeyDown
+  | ClickedOn Int
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -155,7 +156,8 @@ update msg model =
       (model, Cmd.none)
     MouseDown ->
       (model, Cmd.none)
-
+    ClickedOn n ->
+      (model, Cmd.none)  
 
 -- VIEW
 
@@ -171,33 +173,33 @@ view model =
         ]
       canvas =
         --q1
-          [Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (640, 200)]
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (535, 200)]
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (430, 200)]
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (325, 200)]
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (220, 200)]
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (115, 200)]
+          [Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (640, 200)|> onClick (ClickedOn 1)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (535, 200)|> onClick (ClickedOn 2)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (430, 200)|> onClick (ClickedOn 3)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (325, 200)|> onClick (ClickedOn 4)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (220, 200)|> onClick (ClickedOn 5)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (115, 200)|> onClick (ClickedOn 6)]
         --q2
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-640, 200)]
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-535, 200)]
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-430, 200)]
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-325, 200)]
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-220, 200)]
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-115, 200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-640, 200)|> onClick (ClickedOn 7)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-535, 200)|> onClick (ClickedOn 8)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-430, 200)|> onClick (ClickedOn 9)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-325, 200)|> onClick (ClickedOn 10)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-220, 200)|> onClick (ClickedOn 11)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-115, 200)|> onClick (ClickedOn 12)]
         --q3
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-640, -200)]
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-535, -200)]
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-430, -200)]
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-325, -200)]
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-220, -200)]
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-115, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-640, -200)|> onClick (ClickedOn 13)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-535, -200)|> onClick (ClickedOn 14)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-430, -200)|> onClick (ClickedOn 15)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-325, -200)|> onClick (ClickedOn 16)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (-220, -200)|> onClick (ClickedOn 17)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (-115, -200)|> onClick (ClickedOn 18)]
         --q4
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (640, -200)]
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (535, -200)]
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (430, -200)]
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (325, -200)]
-        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (220, -200)]
-        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (115, -200)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (640, -200)|> onClick (ClickedOn 19)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (535, -200)|> onClick (ClickedOn 20)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (430, -200)|> onClick (ClickedOn 21)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (325, -200)|> onClick (ClickedOn 22)]
+        ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (220, -200)|> onClick (ClickedOn 23)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (115, -200)|> onClick (ClickedOn 24)]
         --background and bar
         ++[Collage.rectangle 100 750|> styled (uniform brown, solid thick (uniform black))]
         ++[Collage.rectangle 1400 750|> styled (uniform brown, solid thick (uniform black))]
