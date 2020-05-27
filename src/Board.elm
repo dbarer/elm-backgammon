@@ -127,7 +127,7 @@ initModel ={
        {num_pieces = 1, vulnerable = False, player = 2}
        ]
    },
-   dice = { roll1 = (Random.int 1 6), roll2 = (Random.int 1 6), sel_d1 = True, double = False},
+   dice = { roll1 = 1, roll2 = 1, sel_d1 = True, double = False},
    bar = {whites = 0, blacks = 0},
    p1 = {player_num = 1, beared = False, barred = False},
    p2 = {player_num = 2, beared = False, barred = False},
@@ -138,7 +138,6 @@ initModel ={
 init : Flags -> (Model, Cmd Msg)
 init () =
   (initModel, Cmd.none)
-
 
 -- UPDATE
 
