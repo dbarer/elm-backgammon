@@ -165,7 +165,7 @@ update_vul n =
   case n of
     1 -> True
     _ -> False
-    
+
 update_src : Board -> Int -> Board
 update_src b src =
   case (Array.get src b.spots) of
@@ -187,7 +187,7 @@ update_dst b dst =
         spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces)}
       in
         Board (Array.set dst spot2 b.spots)
-    
+
 select_dice : Dice -> Int
 select_dice d =
   case d.sel_d1 of
@@ -199,7 +199,7 @@ update_board mod n =
   if(legal_move mod.board n (n + (select_dice mod.dice)) == False) then mod.board
   else if (mod.dice.double == True) then Debug.todo "Double"
   else
-    update_dst (update_src mod.board n) (n + select_dice mod.dice)  
+    update_dst (update_src mod.board n) (n + select_dice mod.dice)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -214,6 +214,46 @@ update msg model =
       Debug.log(String.fromInt (Maybe.withDefault (Spot 35 False 0) (Array.get n model.board.spots)).num_pieces)
       ({model | board = update_board model n} , Cmd.none)
 -- VIEW
+makeNPieces : Color -> Int -> Int -> List (Collage msg)
+makeNPieces clr spot cnt =
+  case cnt of
+    0 -> []
+    _ -> case compare 6 spot of
+      -- Q1
+      GT ->
+      EQ ->
+      -- Else
+      LT -> compare 12 spot of
+        -- Q2
+        GT ->
+        EQ ->
+        -- Else
+        LT -> compare 18 spot of
+          -- Q3
+          GT ->
+          EQ ->
+          -- Q4
+          LT ->
+
+--(Collage.circle 30 |> filled (uniform clr) |> shift (200*p.x, 200*p.y))
+
+spotsToPieces : Int -> List Spot -> List (Collage msg)
+spotsToPieces num spots =
+  case spots of
+    p::ps ->
+      if p.player == 1 then
+        case compare 24 num of
+          GT -> makeNPieces Color.black num p.num_pieces ++ spotsToPieces n+1 ps
+          EQ -> makeNPieces Color.black num p.num_pieces ++ spotsToPieces n+1 ps
+          LT -> []
+      else if p.player == 2 then
+        case compare 24 num of
+          GT -> makeNPieces Color.blue num p.num_pieces ++ spotsToPieces n+1 ps
+          EQ -> makeNPieces Color.blue num p.num_pieces ++ spotsToPieces n+1 ps
+          LT -> []
+      else
+        spotsToPieces n+1 ps
+    [] -> []
 
 view : Model -> Html Msg
 view model =
@@ -226,8 +266,9 @@ view model =
         , ("transform", "translate(-50%, -50%)")
         ]
       canvas =
+        spotsToPieces 1 model.board.spots
         --q1
-          [Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (640, 200)|> onClick (ClickedOn 1)]
+        ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (640, 200)|> onClick (ClickedOn 1)]
         ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (535, 200)|> onClick (ClickedOn 2)]
         ++[Collage.ellipse 40 150|> styled (uniform red, solid thick (uniform black))|> shift (430, 200)|> onClick (ClickedOn 3)]
         ++[Collage.ellipse 40 150|> styled (uniform white, solid thick (uniform black))|> shift (325, 200)|> onClick (ClickedOn 4)]
