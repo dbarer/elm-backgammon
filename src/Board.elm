@@ -8,6 +8,7 @@ import Json.Decode as Decode
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Random
+import Array
 import Time
 import Debug
 import Collage exposing (..)
@@ -43,7 +44,7 @@ type alias Spot =
 
 type alias Board =
   {
-  spots : List Spot
+  spots : Array.Array Spot
   }
 
 type alias Player =
@@ -59,7 +60,7 @@ type alias Bar =
   blacks : Int
   }
 
-type alias Die =
+type alias Dice =
   {
   roll1 : Int,
   roll2 : Int,
@@ -86,21 +87,28 @@ type alias Score =
   dbl_p1_ctrl : Bool
   }
 
+type alias Turn =
+  {
+    player : Int
+  }
+
 type alias Model =
   { board : Board,
-    dice : Die,
+    dice : Dice,
     bar : Bar,
     p1 : Player,
     p2 : Player,
-    score : Score
+    score : Score,
+    turn : Turn
     }
+
 
 type alias Flags =
   ()
 
 initModel ={
    board = {
-     spots = [
+     spots = Array.fromList ([
        {num_pieces = 2, vulnerable = False, player = 1},
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 0, vulnerable = False, player = 0},
@@ -125,13 +133,14 @@ initModel ={
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 1, vulnerable = False, player = 2}
-       ]
+       ])
    },
    dice = { roll1 = 1, roll2 = 1, sel_d1 = True, double = False},
    bar = {whites = 0, blacks = 0},
    p1 = {player_num = 1, beared = False, barred = False},
    p2 = {player_num = 2, beared = False, barred = False},
-   score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = True}
+   score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = True},
+   turn = {player = 1}
   }
 
 
@@ -147,6 +156,51 @@ type Msg
   | ClickedOn Int
   | Tick
 
+legal_move : Board -> Int -> Int -> Bool
+legal_move b src dst =
+  True
+
+update_vul : Int -> Bool
+update_vul n =
+  case n of
+    1 -> True
+    _ -> False
+    
+update_src : Board -> Int -> Board
+update_src b src =
+  case (Array.get src b.spots) of
+    Nothing -> b
+    Just spot ->
+      let
+        spot1 = {spot | num_pieces = spot.num_pieces - 1}
+        spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces)}
+      in
+        Board (Array.set src spot2 b.spots)
+
+update_dst : Board -> Int -> Board
+update_dst b dst =
+  case (Array.get dst b.spots) of
+    Nothing -> b
+    Just spot ->
+      let
+        spot1 = {spot | num_pieces = spot.num_pieces + 1}
+        spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces)}
+      in
+        Board (Array.set dst spot2 b.spots)
+    
+select_dice : Dice -> Int
+select_dice d =
+  case d.sel_d1 of
+    True -> d.roll1
+    _ -> d.roll2
+
+update_board : Model -> Int -> Board
+update_board mod n =
+  if(legal_move mod.board n (n + (select_dice mod.dice)) == False) then mod.board
+  else if (mod.dice.double == True) then Debug.todo "Double"
+  else
+    update_dst (update_src mod.board n) (n + select_dice mod.dice)  
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -157,9 +211,8 @@ update msg model =
     Roll ->
       (model, Cmd.none)
     ClickedOn n ->
-      Debug.log(String.fromInt n)
-      (model, Cmd.none)
-
+      Debug.log(String.fromInt (Maybe.withDefault (Spot 35 False 0) (Array.get n model.board.spots)).num_pieces)
+      ({model | board = update_board model n} , Cmd.none)
 -- VIEW
 
 view : Model -> Html Msg
