@@ -32,7 +32,6 @@ main =
     , subscriptions = subscriptions
     }
 
-
 -- MODEL
 
 type alias Spot =
@@ -158,7 +157,7 @@ type Msg
 
 legal_move : Board -> Int -> Int -> Bool
 legal_move b src dst =
-  True
+ True
 
 update_vul : Int -> Bool
 update_vul n =
@@ -173,18 +172,18 @@ update_src b src =
     Just spot ->
       let
         spot1 = {spot | num_pieces = spot.num_pieces - 1}
-        spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces)}
+        spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces) }
       in
         Board (Array.set src spot2 b.spots)
 
-update_dst : Board -> Int -> Board
-update_dst b dst =
+update_dst : Board -> Int -> Int -> Board
+update_dst b dst pl =
   case (Array.get dst b.spots) of
     Nothing -> b
     Just spot ->
       let
         spot1 = {spot | num_pieces = spot.num_pieces + 1}
-        spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces)}
+        spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces), player = pl}
       in
         Board (Array.set dst spot2 b.spots)
 
@@ -194,12 +193,26 @@ select_dice d =
     True -> d.roll1
     _ -> d.roll2
 
+direction : Int -> Int
+direction n =
+  case n of
+    1 -> 1
+    2 -> -1
+    _ -> 0
+
 update_board : Model -> Int -> Board
 update_board mod n =
   if(legal_move mod.board n (n + (select_dice mod.dice)) == False) then mod.board
   else if (mod.dice.double == True) then Debug.todo "Double"
   else
-    update_dst (update_src mod.board n) (n + select_dice mod.dice)
+    update_dst (update_src mod.board n) (n + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
+
+switch_turn : Int -> Int
+switch_turn n =
+  case n of
+    1 -> 2
+    2 -> 1
+    _ -> 1
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -212,7 +225,7 @@ update msg model =
       (model, Cmd.none)
     ClickedOn n ->
       Debug.log(String.fromInt (Maybe.withDefault (Spot 35 False 0) (Array.get n model.board.spots)).num_pieces)
-      ({model | board = update_board model n} , Cmd.none)
+      ({model | board = update_board model n, turn = Turn (switch_turn model.turn.player)}, Cmd.none)
 
 -- VIEW
 --puts N pieces on the given spot
