@@ -6071,23 +6071,29 @@ var $author$project$Board$makeNPieces = F3(
 					return A2(
 						$elm$core$List$cons,
 						A2(
-							$timjs$elm_collage$Collage$shift,
-							_Utils_Tuple2(640 - ((spot - 1) * 105), 380 - ((cnt - 1) * 80)),
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(spot - 1),
 							A2(
-								$timjs$elm_collage$Collage$filled,
-								$timjs$elm_collage$Collage$uniform(clr),
-								$timjs$elm_collage$Collage$circle(40))),
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(640 - ((spot - 1) * 105), 380 - ((cnt - 1) * 80)),
+								A2(
+									$timjs$elm_collage$Collage$filled,
+									$timjs$elm_collage$Collage$uniform(clr),
+									$timjs$elm_collage$Collage$circle(40)))),
 						A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
 				case 'EQ':
 					return A2(
 						$elm$core$List$cons,
 						A2(
-							$timjs$elm_collage$Collage$shift,
-							_Utils_Tuple2(640 - ((spot - 1) * 105), 380 - ((cnt - 1) * 80)),
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(spot - 1),
 							A2(
-								$timjs$elm_collage$Collage$filled,
-								$timjs$elm_collage$Collage$uniform(clr),
-								$timjs$elm_collage$Collage$circle(40))),
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(640 - ((spot - 1) * 105), 380 - ((cnt - 1) * 80)),
+								A2(
+									$timjs$elm_collage$Collage$filled,
+									$timjs$elm_collage$Collage$uniform(clr),
+									$timjs$elm_collage$Collage$circle(40)))),
 						A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
 				default:
 					var _v2 = A2($elm$core$Basics$compare, 12, spot);
@@ -6096,23 +6102,29 @@ var $author$project$Board$makeNPieces = F3(
 							return A2(
 								$elm$core$List$cons,
 								A2(
-									$timjs$elm_collage$Collage$shift,
-									_Utils_Tuple2((-115) - ((spot - 7) * 105), 380 - ((cnt - 1) * 80)),
+									$timjs$elm_collage$Collage$Events$onClick,
+									$author$project$Board$ClickedOn(spot - 1),
 									A2(
-										$timjs$elm_collage$Collage$filled,
-										$timjs$elm_collage$Collage$uniform(clr),
-										$timjs$elm_collage$Collage$circle(40))),
+										$timjs$elm_collage$Collage$shift,
+										_Utils_Tuple2((-115) - ((spot - 7) * 105), 380 - ((cnt - 1) * 80)),
+										A2(
+											$timjs$elm_collage$Collage$filled,
+											$timjs$elm_collage$Collage$uniform(clr),
+											$timjs$elm_collage$Collage$circle(40)))),
 								A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
 						case 'EQ':
 							return A2(
 								$elm$core$List$cons,
 								A2(
-									$timjs$elm_collage$Collage$shift,
-									_Utils_Tuple2((-115) - ((spot - 7) * 105), 380 - ((cnt - 1) * 80)),
+									$timjs$elm_collage$Collage$Events$onClick,
+									$author$project$Board$ClickedOn(spot - 1),
 									A2(
-										$timjs$elm_collage$Collage$filled,
-										$timjs$elm_collage$Collage$uniform(clr),
-										$timjs$elm_collage$Collage$circle(40))),
+										$timjs$elm_collage$Collage$shift,
+										_Utils_Tuple2((-115) - ((spot - 7) * 105), 380 - ((cnt - 1) * 80)),
+										A2(
+											$timjs$elm_collage$Collage$filled,
+											$timjs$elm_collage$Collage$uniform(clr),
+											$timjs$elm_collage$Collage$circle(40)))),
 								A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
 						default:
 							var _v3 = A2($elm$core$Basics$compare, 18, spot);
@@ -6121,34 +6133,43 @@ var $author$project$Board$makeNPieces = F3(
 									return A2(
 										$elm$core$List$cons,
 										A2(
-											$timjs$elm_collage$Collage$shift,
-											_Utils_Tuple2((-640) + ((spot - 13) * 105), (-380) + ((cnt - 1) * 80)),
+											$timjs$elm_collage$Collage$Events$onClick,
+											$author$project$Board$ClickedOn(spot - 1),
 											A2(
-												$timjs$elm_collage$Collage$filled,
-												$timjs$elm_collage$Collage$uniform(clr),
-												$timjs$elm_collage$Collage$circle(40))),
+												$timjs$elm_collage$Collage$shift,
+												_Utils_Tuple2((-640) + ((spot - 13) * 105), (-380) + ((cnt - 1) * 80)),
+												A2(
+													$timjs$elm_collage$Collage$filled,
+													$timjs$elm_collage$Collage$uniform(clr),
+													$timjs$elm_collage$Collage$circle(40)))),
 										A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
 								case 'EQ':
 									return A2(
 										$elm$core$List$cons,
 										A2(
-											$timjs$elm_collage$Collage$shift,
-											_Utils_Tuple2((-640) + ((spot - 13) * 105), (-380) + ((cnt - 1) * 80)),
+											$timjs$elm_collage$Collage$Events$onClick,
+											$author$project$Board$ClickedOn(spot - 1),
 											A2(
-												$timjs$elm_collage$Collage$filled,
-												$timjs$elm_collage$Collage$uniform(clr),
-												$timjs$elm_collage$Collage$circle(40))),
+												$timjs$elm_collage$Collage$shift,
+												_Utils_Tuple2((-640) + ((spot - 13) * 105), (-380) + ((cnt - 1) * 80)),
+												A2(
+													$timjs$elm_collage$Collage$filled,
+													$timjs$elm_collage$Collage$uniform(clr),
+													$timjs$elm_collage$Collage$circle(40)))),
 										A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
 								default:
 									return A2(
 										$elm$core$List$cons,
 										A2(
-											$timjs$elm_collage$Collage$shift,
-											_Utils_Tuple2(115 + ((spot - 19) * 105), (-380) + ((cnt - 1) * 80)),
+											$timjs$elm_collage$Collage$Events$onClick,
+											$author$project$Board$ClickedOn(spot - 1),
 											A2(
-												$timjs$elm_collage$Collage$filled,
-												$timjs$elm_collage$Collage$uniform(clr),
-												$timjs$elm_collage$Collage$circle(40))),
+												$timjs$elm_collage$Collage$shift,
+												_Utils_Tuple2(115 + ((spot - 19) * 105), (-380) + ((cnt - 1) * 80)),
+												A2(
+													$timjs$elm_collage$Collage$filled,
+													$timjs$elm_collage$Collage$uniform(clr),
+													$timjs$elm_collage$Collage$circle(40)))),
 										A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
 							}
 					}
@@ -7134,7 +7155,7 @@ var $author$project$Board$view = function (model) {
 				[
 					A2(
 					$timjs$elm_collage$Collage$Events$onClick,
-					$author$project$Board$ClickedOn(1),
+					$author$project$Board$ClickedOn(0),
 					A2(
 						$timjs$elm_collage$Collage$shift,
 						_Utils_Tuple2(640, 220),
@@ -7153,7 +7174,7 @@ var $author$project$Board$view = function (model) {
 					[
 						A2(
 						$timjs$elm_collage$Collage$Events$onClick,
-						$author$project$Board$ClickedOn(2),
+						$author$project$Board$ClickedOn(1),
 						A2(
 							$timjs$elm_collage$Collage$shift,
 							_Utils_Tuple2(535, 220),
@@ -7172,7 +7193,7 @@ var $author$project$Board$view = function (model) {
 						[
 							A2(
 							$timjs$elm_collage$Collage$Events$onClick,
-							$author$project$Board$ClickedOn(3),
+							$author$project$Board$ClickedOn(2),
 							A2(
 								$timjs$elm_collage$Collage$shift,
 								_Utils_Tuple2(430, 220),
@@ -7191,7 +7212,7 @@ var $author$project$Board$view = function (model) {
 							[
 								A2(
 								$timjs$elm_collage$Collage$Events$onClick,
-								$author$project$Board$ClickedOn(4),
+								$author$project$Board$ClickedOn(3),
 								A2(
 									$timjs$elm_collage$Collage$shift,
 									_Utils_Tuple2(325, 220),
@@ -7210,7 +7231,7 @@ var $author$project$Board$view = function (model) {
 								[
 									A2(
 									$timjs$elm_collage$Collage$Events$onClick,
-									$author$project$Board$ClickedOn(5),
+									$author$project$Board$ClickedOn(4),
 									A2(
 										$timjs$elm_collage$Collage$shift,
 										_Utils_Tuple2(220, 220),
@@ -7229,7 +7250,7 @@ var $author$project$Board$view = function (model) {
 									[
 										A2(
 										$timjs$elm_collage$Collage$Events$onClick,
-										$author$project$Board$ClickedOn(6),
+										$author$project$Board$ClickedOn(5),
 										A2(
 											$timjs$elm_collage$Collage$shift,
 											_Utils_Tuple2(115, 220),
@@ -7248,7 +7269,7 @@ var $author$project$Board$view = function (model) {
 										[
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(12),
+											$author$project$Board$ClickedOn(11),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-640, 220),
@@ -7267,7 +7288,7 @@ var $author$project$Board$view = function (model) {
 											[
 												A2(
 												$timjs$elm_collage$Collage$Events$onClick,
-												$author$project$Board$ClickedOn(11),
+												$author$project$Board$ClickedOn(10),
 												A2(
 													$timjs$elm_collage$Collage$shift,
 													_Utils_Tuple2(-535, 220),
@@ -7286,7 +7307,7 @@ var $author$project$Board$view = function (model) {
 												[
 													A2(
 													$timjs$elm_collage$Collage$Events$onClick,
-													$author$project$Board$ClickedOn(10),
+													$author$project$Board$ClickedOn(9),
 													A2(
 														$timjs$elm_collage$Collage$shift,
 														_Utils_Tuple2(-430, 220),
@@ -7305,7 +7326,7 @@ var $author$project$Board$view = function (model) {
 													[
 														A2(
 														$timjs$elm_collage$Collage$Events$onClick,
-														$author$project$Board$ClickedOn(9),
+														$author$project$Board$ClickedOn(8),
 														A2(
 															$timjs$elm_collage$Collage$shift,
 															_Utils_Tuple2(-325, 220),
@@ -7324,7 +7345,7 @@ var $author$project$Board$view = function (model) {
 														[
 															A2(
 															$timjs$elm_collage$Collage$Events$onClick,
-															$author$project$Board$ClickedOn(8),
+															$author$project$Board$ClickedOn(7),
 															A2(
 																$timjs$elm_collage$Collage$shift,
 																_Utils_Tuple2(-220, 220),
@@ -7343,7 +7364,7 @@ var $author$project$Board$view = function (model) {
 															[
 																A2(
 																$timjs$elm_collage$Collage$Events$onClick,
-																$author$project$Board$ClickedOn(7),
+																$author$project$Board$ClickedOn(6),
 																A2(
 																	$timjs$elm_collage$Collage$shift,
 																	_Utils_Tuple2(-115, 220),
@@ -7362,7 +7383,7 @@ var $author$project$Board$view = function (model) {
 																[
 																	A2(
 																	$timjs$elm_collage$Collage$Events$onClick,
-																	$author$project$Board$ClickedOn(13),
+																	$author$project$Board$ClickedOn(12),
 																	A2(
 																		$timjs$elm_collage$Collage$shift,
 																		_Utils_Tuple2(-640, -220),
@@ -7381,7 +7402,7 @@ var $author$project$Board$view = function (model) {
 																	[
 																		A2(
 																		$timjs$elm_collage$Collage$Events$onClick,
-																		$author$project$Board$ClickedOn(14),
+																		$author$project$Board$ClickedOn(13),
 																		A2(
 																			$timjs$elm_collage$Collage$shift,
 																			_Utils_Tuple2(-535, -220),
@@ -7400,7 +7421,7 @@ var $author$project$Board$view = function (model) {
 																		[
 																			A2(
 																			$timjs$elm_collage$Collage$Events$onClick,
-																			$author$project$Board$ClickedOn(15),
+																			$author$project$Board$ClickedOn(14),
 																			A2(
 																				$timjs$elm_collage$Collage$shift,
 																				_Utils_Tuple2(-430, -220),
@@ -7419,7 +7440,7 @@ var $author$project$Board$view = function (model) {
 																			[
 																				A2(
 																				$timjs$elm_collage$Collage$Events$onClick,
-																				$author$project$Board$ClickedOn(16),
+																				$author$project$Board$ClickedOn(15),
 																				A2(
 																					$timjs$elm_collage$Collage$shift,
 																					_Utils_Tuple2(-325, -220),
@@ -7438,7 +7459,7 @@ var $author$project$Board$view = function (model) {
 																				[
 																					A2(
 																					$timjs$elm_collage$Collage$Events$onClick,
-																					$author$project$Board$ClickedOn(17),
+																					$author$project$Board$ClickedOn(16),
 																					A2(
 																						$timjs$elm_collage$Collage$shift,
 																						_Utils_Tuple2(-220, -220),
@@ -7457,7 +7478,7 @@ var $author$project$Board$view = function (model) {
 																					[
 																						A2(
 																						$timjs$elm_collage$Collage$Events$onClick,
-																						$author$project$Board$ClickedOn(18),
+																						$author$project$Board$ClickedOn(19),
 																						A2(
 																							$timjs$elm_collage$Collage$shift,
 																							_Utils_Tuple2(-115, -220),
@@ -7476,7 +7497,7 @@ var $author$project$Board$view = function (model) {
 																						[
 																							A2(
 																							$timjs$elm_collage$Collage$Events$onClick,
-																							$author$project$Board$ClickedOn(24),
+																							$author$project$Board$ClickedOn(23),
 																							A2(
 																								$timjs$elm_collage$Collage$shift,
 																								_Utils_Tuple2(640, -220),
@@ -7495,7 +7516,7 @@ var $author$project$Board$view = function (model) {
 																							[
 																								A2(
 																								$timjs$elm_collage$Collage$Events$onClick,
-																								$author$project$Board$ClickedOn(23),
+																								$author$project$Board$ClickedOn(22),
 																								A2(
 																									$timjs$elm_collage$Collage$shift,
 																									_Utils_Tuple2(535, -220),
@@ -7514,7 +7535,7 @@ var $author$project$Board$view = function (model) {
 																								[
 																									A2(
 																									$timjs$elm_collage$Collage$Events$onClick,
-																									$author$project$Board$ClickedOn(22),
+																									$author$project$Board$ClickedOn(21),
 																									A2(
 																										$timjs$elm_collage$Collage$shift,
 																										_Utils_Tuple2(430, -220),
@@ -7533,7 +7554,7 @@ var $author$project$Board$view = function (model) {
 																									[
 																										A2(
 																										$timjs$elm_collage$Collage$Events$onClick,
-																										$author$project$Board$ClickedOn(21),
+																										$author$project$Board$ClickedOn(20),
 																										A2(
 																											$timjs$elm_collage$Collage$shift,
 																											_Utils_Tuple2(325, -220),
@@ -7552,7 +7573,7 @@ var $author$project$Board$view = function (model) {
 																										[
 																											A2(
 																											$timjs$elm_collage$Collage$Events$onClick,
-																											$author$project$Board$ClickedOn(20),
+																											$author$project$Board$ClickedOn(19),
 																											A2(
 																												$timjs$elm_collage$Collage$shift,
 																												_Utils_Tuple2(220, -220),
@@ -7571,7 +7592,7 @@ var $author$project$Board$view = function (model) {
 																											[
 																												A2(
 																												$timjs$elm_collage$Collage$Events$onClick,
-																												$author$project$Board$ClickedOn(19),
+																												$author$project$Board$ClickedOn(18),
 																												A2(
 																													$timjs$elm_collage$Collage$shift,
 																													_Utils_Tuple2(115, -220),
@@ -7590,7 +7611,7 @@ var $author$project$Board$view = function (model) {
 																												[
 																													A2(
 																													$timjs$elm_collage$Collage$Events$onClick,
-																													$author$project$Board$ClickedOn(0),
+																													$author$project$Board$ClickedOn(24),
 																													A2(
 																														$timjs$elm_collage$Collage$styled,
 																														_Utils_Tuple2(

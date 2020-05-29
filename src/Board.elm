@@ -216,29 +216,29 @@ update msg model =
 
 -- VIEW
 --puts N pieces on the given spot
-makeNPieces : Color -> Int -> Int -> List (Collage msg)
+makeNPieces : Color -> Int -> Int -> List (Collage Msg)
 makeNPieces clr spot cnt =
   case cnt of
     0 -> []
     _ -> case compare 6 spot of
       -- Q1
-      GT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (640-((spot-1)*105)), toFloat (380-((cnt-1)*80)))) :: (makeNPieces clr spot (cnt-1))
-      EQ -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (640-((spot-1)*105)), toFloat (380-((cnt-1)*80)))) :: (makeNPieces clr spot (cnt-1))
+      GT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (640-((spot-1)*105)), toFloat (380-((cnt-1)*80))) |> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
+      EQ -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (640-((spot-1)*105)), toFloat (380-((cnt-1)*80))) |> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
       -- Else
       LT -> case compare 12 spot of
         -- Q2
-        GT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (-115-((spot-7)*105)), toFloat (380-((cnt-1)*80)))) :: (makeNPieces clr spot (cnt-1))
-        EQ -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (-115-((spot-7)*105)), toFloat (380-((cnt-1)*80)))) :: (makeNPieces clr spot (cnt-1))
+        GT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (-115-((spot-7)*105)), toFloat (380-((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
+        EQ -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (-115-((spot-7)*105)), toFloat (380-((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
         -- Else
         LT -> case compare 18 spot of
           -- Q3
-          GT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (-640+((spot-13)*105)), toFloat (-380+((cnt-1)*80)))) :: (makeNPieces clr spot (cnt-1))
-          EQ -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (-640+((spot-13)*105)), toFloat (-380+((cnt-1)*80)))) :: (makeNPieces clr spot (cnt-1))
+          GT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (-640+((spot-13)*105)), toFloat (-380+((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
+          EQ -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (-640+((spot-13)*105)), toFloat (-380+((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
           -- Q4
-          LT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (115+((spot-19)*105)), toFloat (-380+((cnt-1)*80)))) :: (makeNPieces clr spot (cnt-1))
+          LT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (115+((spot-19)*105)), toFloat (-380+((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
 
 -- iterates over all spots and calls makeNPieces with the proper number and color
-spotsToPieces : Int -> List Spot -> List (Collage msg)
+spotsToPieces : Int -> List Spot -> List (Collage Msg)
 spotsToPieces num spots =
   case spots of
     p::ps ->
@@ -269,35 +269,35 @@ view model =
       canvas =
         spotsToPieces 1 (Array.toList model.board.spots)
         --q1
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (640, 220)|> onClick (ClickedOn 1)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (535, 220)|> onClick (ClickedOn 2)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (430, 220)|> onClick (ClickedOn 3)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (325, 220)|> onClick (ClickedOn 4)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (220, 220)|> onClick (ClickedOn 5)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (115, 220)|> onClick (ClickedOn 6)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (640, 220)|> onClick (ClickedOn 0)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (535, 220)|> onClick (ClickedOn 1)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (430, 220)|> onClick (ClickedOn 2)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (325, 220)|> onClick (ClickedOn 3)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (220, 220)|> onClick (ClickedOn 4)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (115, 220)|> onClick (ClickedOn 5)]
         --q2
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-640, 220)|> onClick (ClickedOn 12)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-535, 220)|> onClick (ClickedOn 11)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-430, 220)|> onClick (ClickedOn 10)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-325, 220)|> onClick (ClickedOn 9)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-220, 220)|> onClick (ClickedOn 8)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-115, 220)|> onClick (ClickedOn 7)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-640, 220)|> onClick (ClickedOn 11)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-535, 220)|> onClick (ClickedOn 10)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-430, 220)|> onClick (ClickedOn 9)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-325, 220)|> onClick (ClickedOn 8)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-220, 220)|> onClick (ClickedOn 7)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-115, 220)|> onClick (ClickedOn 6)]
         --q3
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-640, -220)|> onClick (ClickedOn 13)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-535, -220)|> onClick (ClickedOn 14)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-430, -220)|> onClick (ClickedOn 15)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-325, -220)|> onClick (ClickedOn 16)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-220, -220)|> onClick (ClickedOn 17)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-115, -220)|> onClick (ClickedOn 18)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-640, -220)|> onClick (ClickedOn 12)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-535, -220)|> onClick (ClickedOn 13)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-430, -220)|> onClick (ClickedOn 14)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-325, -220)|> onClick (ClickedOn 15)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-220, -220)|> onClick (ClickedOn 16)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-115, -220)|> onClick (ClickedOn 19)]
         --q4
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (640, -220)|> onClick (ClickedOn 24)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (535, -220)|> onClick (ClickedOn 23)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (430, -220)|> onClick (ClickedOn 22)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (325, -220)|> onClick (ClickedOn 21)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (220, -220)|> onClick (ClickedOn 20)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (115, -220)|> onClick (ClickedOn 19)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (640, -220)|> onClick (ClickedOn 23)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (535, -220)|> onClick (ClickedOn 22)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (430, -220)|> onClick (ClickedOn 21)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (325, -220)|> onClick (ClickedOn 20)]
+        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (220, -220)|> onClick (ClickedOn 19)]
+        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (115, -220)|> onClick (ClickedOn 18)]
         --background and bar
-        ++[Collage.rectangle 100 880|> styled (uniform brown, solid thick (uniform black))|> onClick (ClickedOn 0)]
+        ++[Collage.rectangle 100 880|> styled (uniform brown, solid thick (uniform black))|> onClick (ClickedOn 24)]
         ++[Collage.rectangle 1400 880|> styled (uniform brown, solid thick (uniform black))]
 
       display =
