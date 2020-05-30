@@ -166,7 +166,6 @@ legal_move m src dst =
             GT -> False
             EQ -> True
             LT -> True
-
     src_check  =
       case (Array.get src m.board.spots) of
         Nothing -> False
@@ -176,6 +175,8 @@ legal_move m src dst =
             _ -> False
   in
     dst_check && src_check
+
+
 update_vul : Int -> Bool
 update_vul n =
   case n of
@@ -193,17 +194,29 @@ update_src b src =
       in
         Board (Array.set src spot2 b.spots)
 
-update_dst : Board -> Int -> Int -> Board
-update_dst b dst pl =
+update_dst : Board -> Bar -> Int -> Int -> (Board , Bar)
+update_dst b bar dst pl =
   case (Array.get dst b.spots) of
-    Nothing -> b
+    Nothing -> (b, bar) 
     Just spot ->
-      let
-        spot1 = {spot | num_pieces = spot.num_pieces + 1}
-        spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces), player = pl}
-      in
-        Board (Array.set dst spot2 b.spots)
-
+      if(spot.vulnerable == False) then 
+        let
+          spot1 = {spot | num_pieces = spot.num_pieces + 1}
+          spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces), player = pl}
+        in
+          (Board (Array.set dst spot2 b.spots) , bar)
+      else
+        let
+          spot1 = {spot | player = pl}
+          w = bar.whites
+          bl = bar.blacks
+          bars =
+            case pl of
+              1 -> {bar | whites = w + 1}
+              2 -> {bar | blacks = bl + 1}
+              _ -> bar
+        in
+          (Board (Array.set dst spot1 b.spots), bars)
 
 select_dice : Dice -> Int
 select_dice d =
@@ -224,12 +237,12 @@ direction n =
     2 -> -1
     _ -> 1
 
-update_board : Model -> Int -> Board
+update_board : Model -> Int -> (Board , Bar)
 update_board mod n =
-  if(legal_move mod n (n + (select_dice mod.dice)) == False) then mod.board
+  if(legal_move mod n (n + (select_dice mod.dice)) == False) then (mod.board, mod.bar)
   else if (mod.dice.double == True) then Debug.todo "Double"
   else
-    update_dst (update_src mod.board n) (n + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
+   update_dst (update_src mod.board n) mod.bar (n + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
 
 switch_turn : Int -> Int
 switch_turn n =
@@ -238,21 +251,28 @@ switch_turn n =
     2 -> 1
     _ -> 2
 
+dice_val : Dice -> Int
+dice_val d =
+ case d.sel_d1 of
+        True -> d.roll1
+        _ -> d.roll2
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Tick ->
+    Tick -> 
       (model, Cmd.none)
     Double ->
       (model, Cmd.none)
     Upd_dice d -> ({model | dice = d}, Cmd.none)
     ClickedOn n ->      
       let
-        legal = legal_move model n (n + (direction model.turn.player) * 3)
+        legal = legal_move model n (n + (direction model.turn.player) * (dice_val model.dice))
+        tup = update_board model n
       in
         case legal of 
           False -> (model, Cmd.none)
-          _ -> ({model | board = update_board model n, turn = Turn (switch_turn model.turn.player)}, Random.generate Upd_dice dice_roll)
+          _ -> ({model | board = Tuple.first tup, bar = Tuple.second tup, turn = Turn (switch_turn model.turn.player)}, Random.generate Upd_dice dice_roll)
 
 -- VIEW
 --puts N pieces on the given spot
