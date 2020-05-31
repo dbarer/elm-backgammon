@@ -131,7 +131,9 @@ initModel ={
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 2, vulnerable = False, player = 2}
+       {num_pieces = 2, vulnerable = False, player = 2},
+       {num_pieces = 0, vulnerable = False, player = 1},
+       {num_pieces = 0, vulnerable = False, player = 2}
        ])
    },
    dice = { roll1 = 3, roll2 = 1, sel_d1 = True, double = False},
@@ -212,11 +214,19 @@ update_dst b bar dst pl =
           bl = bar.blacks
           bars =
             case pl of
-              1 -> {bar | whites = w + 1}
-              2 -> {bar | blacks = bl + 1}
+              1 -> {bar | blacks = bl + 1}
+              2 -> {bar | whites = w + 1}
               _ -> bar
+          bar_index  =
+            case pl of
+              1 -> 25
+              2 -> 24
+              _ -> 0
+          bar_spot = case (Array.get bar_index b.spots) of
+            Nothing -> spot1
+            Just spot2 -> {spot2 | num_pieces = spot2.num_pieces + 1}
         in
-          (Board (Array.set dst spot1 b.spots), bars)
+          (Board (Array.set bar_index bar_spot (Array.set dst spot1 b.spots)), bars)
 
 select_dice : Dice -> Int
 select_dice d =
