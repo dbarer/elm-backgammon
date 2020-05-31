@@ -362,7 +362,6 @@ view model =
         --doubling cube
         ++[((Text.fromString ("64"))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> Text.size 38 |> rendered |> shift (0, 0)),
             (Collage.square 85|> styled (uniform white, solid thick (uniform black))|> onClick (ClickedOn (-10)))]
-          --((Text.fromString (String.fromInt model.hitCount))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> rendered |> shift (-100, -250))]
         --q1
         ++[(Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (640, 220)|> onClick (ClickedOn 0)),
         (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (535, 220)|> onClick (ClickedOn 1)),
