@@ -5305,10 +5305,12 @@ var $author$project$Board$initModel = {
 					{num_pieces: 0, player: 0, vulnerable: false},
 					{num_pieces: 0, player: 0, vulnerable: false},
 					{num_pieces: 0, player: 0, vulnerable: false},
+					{num_pieces: 2, player: 2, vulnerable: false},
+					{num_pieces: 2, player: 1, vulnerable: false},
 					{num_pieces: 2, player: 2, vulnerable: false}
 				]))
 	},
-	dice: {_double: false, roll1: 1, roll2: 1, sel_d1: true},
+	dice: {_double: false, roll1: 3, roll2: 1, sel_d1: true},
 	p1: {barred: false, beared: false, player_num: 1},
 	p2: {barred: false, beared: false, player_num: 2},
 	score: {dbl_p1_ctrl: true, doubled_val: 1, p1: 0, p2: 0},
@@ -5743,12 +5745,192 @@ var $author$project$Board$subscriptions = function (model) {
 			return $author$project$Board$Tick;
 		});
 };
-var $author$project$Board$Spot = F3(
-	function (num_pieces, vulnerable, player) {
-		return {num_pieces: num_pieces, player: player, vulnerable: vulnerable};
+var $author$project$Board$Turn = function (player) {
+	return {player: player};
+};
+var $author$project$Board$Upd_dice = function (a) {
+	return {$: 'Upd_dice', a: a};
+};
+var $author$project$Board$Dice = F4(
+	function (roll1, roll2, sel_d1, _double) {
+		return {_double: _double, roll1: roll1, roll2: roll2, sel_d1: sel_d1};
 	});
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
 var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 'Seed', a: a, b: b};
+	});
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$random$Random$next = function (_v0) {
+	var state0 = _v0.a;
+	var incr = _v0.b;
+	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+};
+var $elm$core$Bitwise$xor = _Bitwise_xor;
+var $elm$random$Random$peel = function (_v0) {
+	var state = _v0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
+var $elm$random$Random$int = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
+				var lo = _v0.a;
+				var hi = _v0.b;
+				var range = (hi - lo) + 1;
+				if (!((range - 1) & range)) {
+					return _Utils_Tuple2(
+						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
+						$elm$random$Random$next(seed0));
+				} else {
+					var threshhold = (((-range) >>> 0) % range) >>> 0;
+					var accountForBias = function (seed) {
+						accountForBias:
+						while (true) {
+							var x = $elm$random$Random$peel(seed);
+							var seedN = $elm$random$Random$next(seed);
+							if (_Utils_cmp(x, threshhold) < 0) {
+								var $temp$seed = seedN;
+								seed = $temp$seed;
+								continue accountForBias;
+							} else {
+								return _Utils_Tuple2((x % range) + lo, seedN);
+							}
+						}
+					};
+					return accountForBias(seed0);
+				}
+			});
+	});
+var $elm$random$Random$map2 = F3(
+	function (func, _v0, _v1) {
+		var genA = _v0.a;
+		var genB = _v1.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v2 = genA(seed0);
+				var a = _v2.a;
+				var seed1 = _v2.b;
+				var _v3 = genB(seed1);
+				var b = _v3.a;
+				var seed2 = _v3.b;
+				return _Utils_Tuple2(
+					A2(func, a, b),
+					seed2);
+			});
+	});
+var $author$project$Board$dice_roll = A3(
+	$elm$random$Random$map2,
+	F2(
+		function (x, y) {
+			return A4($author$project$Board$Dice, x, y, true, false);
+		}),
+	A2($elm$random$Random$int, 1, 6),
+	A2($elm$random$Random$int, 1, 6));
+var $author$project$Board$dice_val = function (d) {
+	var _v0 = d.sel_d1;
+	if (_v0) {
+		return d.roll1;
+	} else {
+		return d.roll2;
+	}
+};
+var $author$project$Board$direction = function (n) {
+	switch (n) {
+		case 1:
+			return 1;
+		case 2:
+			return -1;
+		default:
+			return 1;
+	}
+};
+var $elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
+};
+var $elm$random$Random$initialSeed = function (x) {
+	var _v0 = $elm$random$Random$next(
+		A2($elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _v0.a;
+	var incr = _v0.b;
+	var state2 = (state1 + x) >>> 0;
+	return $elm$random$Random$next(
+		A2($elm$random$Random$Seed, state2, incr));
+};
+var $elm$time$Time$posixToMillis = function (_v0) {
+	var millis = _v0.a;
+	return millis;
+};
+var $elm$random$Random$init = A2(
+	$elm$core$Task$andThen,
+	function (time) {
+		return $elm$core$Task$succeed(
+			$elm$random$Random$initialSeed(
+				$elm$time$Time$posixToMillis(time)));
+	},
+	$elm$time$Time$now);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
+	});
+var $elm$random$Random$onEffects = F3(
+	function (router, commands, seed) {
+		if (!commands.b) {
+			return $elm$core$Task$succeed(seed);
+		} else {
+			var generator = commands.a.a;
+			var rest = commands.b;
+			var _v1 = A2($elm$random$Random$step, generator, seed);
+			var value = _v1.a;
+			var newSeed = _v1.b;
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$random$Random$onEffects, router, rest, newSeed);
+				},
+				A2($elm$core$Platform$sendToApp, router, value));
+		}
+	});
+var $elm$random$Random$onSelfMsg = F3(
+	function (_v0, _v1, seed) {
+		return $elm$core$Task$succeed(seed);
+	});
+var $elm$random$Random$map = F2(
+	function (func, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v1 = genA(seed0);
+				var a = _v1.a;
+				var seed1 = _v1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
+var $elm$random$Random$cmdMap = F2(
+	function (func, _v0) {
+		var generator = _v0.a;
+		return $elm$random$Random$Generate(
+			A2($elm$random$Random$map, func, generator));
+	});
+_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
+var $elm$random$Random$command = _Platform_leaf('Random');
+var $elm$random$Random$generate = F2(
+	function (tagger, generator) {
+		return $elm$random$Random$command(
+			$elm$random$Random$Generate(
+				A2($elm$random$Random$map, tagger, generator)));
+	});
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
@@ -5789,11 +5971,55 @@ var $elm$core$Array$get = F2(
 			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var $elm$core$Debug$log = _Debug_log;
 var $author$project$Board$legal_move = F3(
-	function (b, src, dst) {
-		return true;
+	function (m, src, dst) {
+		var src_check = function () {
+			var _v2 = A2($elm$core$Array$get, src, m.board.spots);
+			if (_v2.$ === 'Nothing') {
+				return false;
+			} else {
+				var spot = _v2.a;
+				var _v3 = A2($elm$core$Basics$compare, spot.player, m.turn.player);
+				if (_v3.$ === 'EQ') {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}();
+		var dst_check = function () {
+			var _v0 = A2($elm$core$Array$get, dst, m.board.spots);
+			if (_v0.$ === 'Nothing') {
+				return false;
+			} else {
+				var spot = _v0.a;
+				var _v1 = A2($elm$core$Basics$compare, spot.num_pieces, 1);
+				switch (_v1.$) {
+					case 'GT':
+						return false;
+					case 'EQ':
+						return true;
+					default:
+						return true;
+				}
+			}
+		}();
+		return dst_check && src_check;
 	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $author$project$Board$switch_turn = function (n) {
+	switch (n) {
+		case 1:
+			return 2;
+		case 2:
+			return 1;
+		default:
+			return 2;
+	}
+};
 var $author$project$Board$select_dice = function (d) {
 	var _v0 = d.sel_d1;
 	if (_v0) {
@@ -5856,23 +6082,77 @@ var $author$project$Board$update_vul = function (n) {
 		return false;
 	}
 };
-var $author$project$Board$update_dst = F2(
-	function (b, dst) {
+var $author$project$Board$update_dst = F4(
+	function (b, bar, dst, pl) {
 		var _v0 = A2($elm$core$Array$get, dst, b.spots);
 		if (_v0.$ === 'Nothing') {
-			return b;
+			return _Utils_Tuple2(b, bar);
 		} else {
 			var spot = _v0.a;
-			var spot1 = _Utils_update(
-				spot,
-				{num_pieces: spot.num_pieces + 1});
-			var spot2 = _Utils_update(
-				spot1,
-				{
-					vulnerable: $author$project$Board$update_vul(spot1.num_pieces)
-				});
-			return $author$project$Board$Board(
-				A3($elm$core$Array$set, dst, spot2, b.spots));
+			if (!spot.vulnerable) {
+				var spot1 = _Utils_update(
+					spot,
+					{num_pieces: spot.num_pieces + 1});
+				var spot2 = _Utils_update(
+					spot1,
+					{
+						player: pl,
+						vulnerable: $author$project$Board$update_vul(spot1.num_pieces)
+					});
+				return _Utils_Tuple2(
+					$author$project$Board$Board(
+						A3($elm$core$Array$set, dst, spot2, b.spots)),
+					bar);
+			} else {
+				var w = bar.whites;
+				var spot1 = _Utils_update(
+					spot,
+					{player: pl});
+				var bl = bar.blacks;
+				var bars = function () {
+					switch (pl) {
+						case 1:
+							return _Utils_update(
+								bar,
+								{blacks: bl + 1});
+						case 2:
+							return _Utils_update(
+								bar,
+								{whites: w + 1});
+						default:
+							return bar;
+					}
+				}();
+				var bar_index = function () {
+					switch (pl) {
+						case 1:
+							return 25;
+						case 2:
+							return 24;
+						default:
+							return 0;
+					}
+				}();
+				var bar_spot = function () {
+					var _v1 = A2($elm$core$Array$get, bar_index, b.spots);
+					if (_v1.$ === 'Nothing') {
+						return spot1;
+					} else {
+						var spot2 = _v1.a;
+						return _Utils_update(
+							spot2,
+							{num_pieces: spot2.num_pieces + 1});
+					}
+				}();
+				return _Utils_Tuple2(
+					$author$project$Board$Board(
+						A3(
+							$elm$core$Array$set,
+							bar_index,
+							bar_spot,
+							A3($elm$core$Array$set, dst, spot1, b.spots))),
+					bars);
+			}
 		}
 	});
 var $author$project$Board$update_src = F2(
@@ -5898,26 +6178,19 @@ var $author$project$Board$update_board = F2(
 	function (mod, n) {
 		return (!A3(
 			$author$project$Board$legal_move,
-			mod.board,
+			mod,
 			n,
-			n + $author$project$Board$select_dice(mod.dice))) ? mod.board : (mod.dice._double ? _Debug_todo(
+			n + $author$project$Board$select_dice(mod.dice))) ? _Utils_Tuple2(mod.board, mod.bar) : (mod.dice._double ? _Debug_todo(
 			'Board',
 			{
-				start: {line: 200, column: 42},
-				end: {line: 200, column: 52}
-			})('Double') : A2(
+				start: {line: 253, column: 42},
+				end: {line: 253, column: 52}
+			})('Double') : A4(
 			$author$project$Board$update_dst,
 			A2($author$project$Board$update_src, mod.board, n),
-			n + $author$project$Board$select_dice(mod.dice)));
-	});
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
+			mod.bar,
+			n + ($author$project$Board$direction(mod.turn.player) * $author$project$Board$select_dice(mod.dice)),
+			mod.turn.player));
 	});
 var $author$project$Board$update = F2(
 	function (msg, model) {
@@ -5926,44 +6199,83 @@ var $author$project$Board$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'Double':
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'Roll':
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			case 'Upd_dice':
+				var d = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{dice: d}),
+					$elm$core$Platform$Cmd$none);
 			default:
 				var n = msg.a;
-				return A2(
-					$elm$core$Debug$log,
-					$elm$core$String$fromInt(
-						A2(
-							$elm$core$Maybe$withDefault,
-							A3($author$project$Board$Spot, 35, false, 0),
-							A2($elm$core$Array$get, n, model.board.spots)).num_pieces),
-					_Utils_Tuple2(
+				if (_Utils_eq(n, -10)) {
+					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								board: A2($author$project$Board$update_board, model, n)
+								turn: $author$project$Board$Turn(
+									$author$project$Board$switch_turn(model.turn.player))
 							}),
-						$elm$core$Platform$Cmd$none));
+						A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll));
+				} else {
+					var tup = A2($author$project$Board$update_board, model, n);
+					var legal = A3(
+						$author$project$Board$legal_move,
+						model,
+						n,
+						n + ($author$project$Board$direction(model.turn.player) * $author$project$Board$dice_val(model.dice)));
+					if (!legal) {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					} else {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{bar: tup.b, board: tup.a}),
+							$elm$core$Platform$Cmd$none);
+					}
+				}
 		}
 	});
 var $author$project$Board$ClickedOn = function (a) {
 	return {$: 'ClickedOn', a: a};
 };
+var $timjs$elm_collage$Collage$Text$SmallCaps = {$: 'SmallCaps'};
 var $avh4$elm_color$Color$RgbaSpace = F4(
 	function (a, b, c, d) {
 		return {$: 'RgbaSpace', a: a, b: b, c: c, d: d};
 	});
 var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $avh4$elm_color$Color$brown = A4($avh4$elm_color$Color$RgbaSpace, 193 / 255, 125 / 255, 17 / 255, 1.0);
+var $timjs$elm_collage$Collage$Core$Chunk = F2(
+	function (a, b) {
+		return {$: 'Chunk', a: a, b: b};
+	});
+var $timjs$elm_collage$Collage$Text$color = F2(
+	function (newcolor, _v0) {
+		var sty = _v0.a;
+		var str = _v0.b;
+		return A2(
+			$timjs$elm_collage$Collage$Core$Chunk,
+			_Utils_update(
+				sty,
+				{color: newcolor}),
+			str);
+	});
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $timjs$elm_collage$Collage$Core$Ellipse = F2(
 	function (a, b) {
 		return {$: 'Ellipse', a: a, b: b};
 	});
 var $timjs$elm_collage$Collage$ellipse = $timjs$elm_collage$Collage$Core$Ellipse;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
+var $timjs$elm_collage$Collage$Text$None = {$: 'None'};
+var $timjs$elm_collage$Collage$Text$Regular = {$: 'Regular'};
+var $timjs$elm_collage$Collage$Text$Sansserif = {$: 'Sansserif'};
+var $timjs$elm_collage$Collage$Text$Upright = {$: 'Upright'};
+var $timjs$elm_collage$Collage$Text$normal = 16;
+var $timjs$elm_collage$Collage$Text$defaultStyle = {color: $avh4$elm_color$Color$black, line: $timjs$elm_collage$Collage$Text$None, shape: $timjs$elm_collage$Collage$Text$Upright, size: $timjs$elm_collage$Collage$Text$normal, typeface: $timjs$elm_collage$Collage$Text$Sansserif, weight: $timjs$elm_collage$Collage$Text$Regular};
+var $timjs$elm_collage$Collage$Text$fromString = $timjs$elm_collage$Collage$Core$Chunk($timjs$elm_collage$Collage$Text$defaultStyle);
+var $avh4$elm_color$Color$green = A4($avh4$elm_color$Color$RgbaSpace, 115 / 255, 210 / 255, 22 / 255, 1.0);
+var $timjs$elm_collage$Collage$Text$large = 19;
 var $timjs$elm_collage$Collage$Events$on = F3(
 	function (event, decoder, collage) {
 		return _Utils_update(
@@ -5992,6 +6304,70 @@ var $timjs$elm_collage$Collage$rectangle = F2(
 		return A3($timjs$elm_collage$Collage$roundedRectangle, w, h, 0);
 	});
 var $avh4$elm_color$Color$red = A4($avh4$elm_color$Color$RgbaSpace, 204 / 255, 0 / 255, 0 / 255, 1.0);
+var $timjs$elm_collage$Collage$Core$Text = F2(
+	function (a, b) {
+		return {$: 'Text', a: a, b: b};
+	});
+var $timjs$elm_collage$Collage$Core$collage = function (basic) {
+	return {
+		basic: basic,
+		handlers: _List_Nil,
+		name: $elm$core$Maybe$Nothing,
+		opacity: 1,
+		rotation: 0,
+		scale: _Utils_Tuple2(1, 1),
+		shift: _Utils_Tuple2(0, 0)
+	};
+};
+var $timjs$elm_collage$Collage$Text$height = function (_v0) {
+	var sty = _v0.a;
+	return sty.size;
+};
+var $timjs$elm_collage$Collage$Text$width = function (text) {
+	var sty = text.a;
+	var str = text.b;
+	return ($timjs$elm_collage$Collage$Text$height(text) / 2) * $elm$core$String$length(str);
+};
+var $timjs$elm_collage$Collage$rendered = function (text) {
+	return $timjs$elm_collage$Collage$Core$collage(
+		A2(
+			$timjs$elm_collage$Collage$Core$Text,
+			_Utils_Tuple2(
+				$timjs$elm_collage$Collage$Text$width(text),
+				$timjs$elm_collage$Collage$Text$height(text)),
+			text));
+};
+var $timjs$elm_collage$Collage$scaleXY = F2(
+	function (_v0, collage) {
+		var sx = _v0.a;
+		var sy = _v0.b;
+		var _v1 = collage.scale;
+		var sx0 = _v1.a;
+		var sy0 = _v1.b;
+		return _Utils_update(
+			collage,
+			{
+				scale: _Utils_Tuple2(sx0 * sx, sy0 * sy)
+			});
+	});
+var $timjs$elm_collage$Collage$scale = F2(
+	function (s, collage) {
+		return A2(
+			$timjs$elm_collage$Collage$scaleXY,
+			_Utils_Tuple2(s, s),
+			collage);
+	});
+var $timjs$elm_collage$Collage$Text$shape = F2(
+	function (newshape, _v0) {
+		var sty = _v0.a;
+		var str = _v0.b;
+		return A2(
+			$timjs$elm_collage$Collage$Core$Chunk,
+			_Utils_update(
+				sty,
+				{shape: newshape}),
+			str);
+	});
 var $timjs$elm_collage$Collage$shift = F2(
 	function (_v0, collage) {
 		var dx = _v0.a;
@@ -6004,6 +6380,17 @@ var $timjs$elm_collage$Collage$shift = F2(
 			{
 				shift: _Utils_Tuple2(x + dx, y + dy)
 			});
+	});
+var $timjs$elm_collage$Collage$Text$size = F2(
+	function (newsize, _v0) {
+		var sty = _v0.a;
+		var str = _v0.b;
+		return A2(
+			$timjs$elm_collage$Collage$Core$Chunk,
+			_Utils_update(
+				sty,
+				{size: newsize}),
+			str);
 	});
 var $timjs$elm_collage$Collage$Flat = {$: 'Flat'};
 var $timjs$elm_collage$Collage$Sharp = {$: 'Sharp'};
@@ -6039,17 +6426,6 @@ var $timjs$elm_collage$Collage$Core$Shape = F2(
 	function (a, b) {
 		return {$: 'Shape', a: a, b: b};
 	});
-var $timjs$elm_collage$Collage$Core$collage = function (basic) {
-	return {
-		basic: basic,
-		handlers: _List_Nil,
-		name: $elm$core$Maybe$Nothing,
-		opacity: 1,
-		rotation: 0,
-		scale: _Utils_Tuple2(1, 1),
-		shift: _Utils_Tuple2(0, 0)
-	};
-};
 var $timjs$elm_collage$Collage$styled = function (style) {
 	return A2(
 		$elm$core$Basics$composeL,
@@ -6158,19 +6534,63 @@ var $author$project$Board$makeNPieces = F3(
 													$timjs$elm_collage$Collage$circle(40)))),
 										A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
 								default:
-									return A2(
-										$elm$core$List$cons,
-										A2(
-											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(spot - 1),
-											A2(
-												$timjs$elm_collage$Collage$shift,
-												_Utils_Tuple2(115 + ((spot - 19) * 105), (-380) + ((cnt - 1) * 80)),
+									var _v4 = A2($elm$core$Basics$compare, 24, spot);
+									switch (_v4.$) {
+										case 'GT':
+											return A2(
+												$elm$core$List$cons,
 												A2(
-													$timjs$elm_collage$Collage$filled,
-													$timjs$elm_collage$Collage$uniform(clr),
-													$timjs$elm_collage$Collage$circle(40)))),
-										A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+													$timjs$elm_collage$Collage$Events$onClick,
+													$author$project$Board$ClickedOn(spot - 1),
+													A2(
+														$timjs$elm_collage$Collage$shift,
+														_Utils_Tuple2(115 + ((spot - 19) * 105), (-380) + ((cnt - 1) * 80)),
+														A2(
+															$timjs$elm_collage$Collage$filled,
+															$timjs$elm_collage$Collage$uniform(clr),
+															$timjs$elm_collage$Collage$circle(40)))),
+												A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+										case 'EQ':
+											return A2(
+												$elm$core$List$cons,
+												A2(
+													$timjs$elm_collage$Collage$Events$onClick,
+													$author$project$Board$ClickedOn(spot - 1),
+													A2(
+														$timjs$elm_collage$Collage$shift,
+														_Utils_Tuple2(115 + ((spot - 19) * 105), (-380) + ((cnt - 1) * 80)),
+														A2(
+															$timjs$elm_collage$Collage$filled,
+															$timjs$elm_collage$Collage$uniform(clr),
+															$timjs$elm_collage$Collage$circle(40)))),
+												A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+										default:
+											return (spot === 25) ? A2(
+												$elm$core$List$cons,
+												A2(
+													$timjs$elm_collage$Collage$Events$onClick,
+													$author$project$Board$ClickedOn(spot - 1),
+													A2(
+														$timjs$elm_collage$Collage$shift,
+														_Utils_Tuple2(0, 100 + ((cnt - 1) * 80)),
+														A2(
+															$timjs$elm_collage$Collage$filled,
+															$timjs$elm_collage$Collage$uniform(clr),
+															$timjs$elm_collage$Collage$circle(40)))),
+												A3($author$project$Board$makeNPieces, clr, spot, cnt - 1)) : ((spot === 26) ? A2(
+												$elm$core$List$cons,
+												A2(
+													$timjs$elm_collage$Collage$Events$onClick,
+													$author$project$Board$ClickedOn(spot - 1),
+													A2(
+														$timjs$elm_collage$Collage$shift,
+														_Utils_Tuple2(0, (-100) - ((cnt - 1) * 80)),
+														A2(
+															$timjs$elm_collage$Collage$filled,
+															$timjs$elm_collage$Collage$uniform(clr),
+															$timjs$elm_collage$Collage$circle(40)))),
+												A3($author$project$Board$makeNPieces, clr, spot, cnt - 1)) : _List_Nil);
+									}
 							}
 					}
 			}
@@ -6184,7 +6604,7 @@ var $author$project$Board$spotsToPieces = F2(
 				var p = spots.a;
 				var ps = spots.b;
 				if (p.player === 1) {
-					var _v1 = A2($elm$core$Basics$compare, 24, num);
+					var _v1 = A2($elm$core$Basics$compare, 26, num);
 					switch (_v1.$) {
 						case 'GT':
 							return _Utils_ap(
@@ -6199,7 +6619,7 @@ var $author$project$Board$spotsToPieces = F2(
 					}
 				} else {
 					if (p.player === 2) {
-						var _v2 = A2($elm$core$Basics$compare, 24, num);
+						var _v2 = A2($elm$core$Basics$compare, 26, num);
 						switch (_v2.$) {
 							case 'GT':
 								return _Utils_ap(
@@ -6225,6 +6645,9 @@ var $author$project$Board$spotsToPieces = F2(
 			}
 		}
 	});
+var $timjs$elm_collage$Collage$square = function (size) {
+	return A2($timjs$elm_collage$Collage$rectangle, size, size);
+};
 var $timjs$elm_collage$Collage$Core$Group = function (a) {
 	return {$: 'Group', a: a};
 };
@@ -6381,6 +6804,15 @@ var $elm$core$List$unzip = function (pairs) {
 		_Utils_Tuple2(_List_Nil, _List_Nil),
 		pairs);
 };
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var $timjs$elm_collage$Collage$Layout$distances = function (col) {
 	var points = $timjs$elm_collage$Collage$Layout$handleBasic(col.basic);
 	var _v8 = $elm$core$List$unzip(
@@ -6614,10 +7046,6 @@ var $timjs$elm_collage$Collage$Render$decodeJoin = function (join) {
 	}
 };
 var $elm$core$Basics$pi = _Basics_pi;
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $timjs$elm_collage$Collage$Render$decodeTransform = function (collage) {
 	var sy = $elm$core$String$fromFloat(collage.scale.b);
 	var sx = $elm$core$String$fromFloat(collage.scale.a);
@@ -7154,49 +7582,496 @@ var $author$project$Board$view = function (model) {
 			_List_fromArray(
 				[
 					A2(
+					$timjs$elm_collage$Collage$shift,
+					_Utils_Tuple2(
+						$author$project$Board$direction(model.turn.player) * 272,
+						0),
+					$timjs$elm_collage$Collage$rendered(
+						A2(
+							$timjs$elm_collage$Collage$Text$size,
+							30,
+							A2(
+								$timjs$elm_collage$Collage$Text$shape,
+								$timjs$elm_collage$Collage$Text$SmallCaps,
+								A2(
+									$timjs$elm_collage$Collage$Text$color,
+									$avh4$elm_color$Color$black,
+									A2(
+										$timjs$elm_collage$Collage$Text$size,
+										$timjs$elm_collage$Collage$Text$large,
+										$timjs$elm_collage$Collage$Text$fromString(
+											$elm$core$String$fromInt(model.dice.roll1)))))))),
+					A2(
+					$timjs$elm_collage$Collage$shift,
+					_Utils_Tuple2(
+						$author$project$Board$direction(model.turn.player) * 272,
+						0),
+					A2(
+						$timjs$elm_collage$Collage$styled,
+						_Utils_Tuple2(
+							$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+							A2(
+								$timjs$elm_collage$Collage$solid,
+								$timjs$elm_collage$Collage$thick,
+								$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+						A3($timjs$elm_collage$Collage$roundedRectangle, 60, 60, 5))),
+					A2(
+					$timjs$elm_collage$Collage$shift,
+					_Utils_Tuple2(
+						$author$project$Board$direction(model.turn.player) * 482,
+						0),
+					$timjs$elm_collage$Collage$rendered(
+						A2(
+							$timjs$elm_collage$Collage$Text$size,
+							30,
+							A2(
+								$timjs$elm_collage$Collage$Text$shape,
+								$timjs$elm_collage$Collage$Text$SmallCaps,
+								A2(
+									$timjs$elm_collage$Collage$Text$color,
+									$avh4$elm_color$Color$black,
+									A2(
+										$timjs$elm_collage$Collage$Text$size,
+										$timjs$elm_collage$Collage$Text$large,
+										$timjs$elm_collage$Collage$Text$fromString(
+											$elm$core$String$fromInt(model.dice.roll2)))))))),
+					A2(
+					$timjs$elm_collage$Collage$shift,
+					_Utils_Tuple2(
+						$author$project$Board$direction(model.turn.player) * 482,
+						0),
+					A2(
+						$timjs$elm_collage$Collage$styled,
+						_Utils_Tuple2(
+							$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+							A2(
+								$timjs$elm_collage$Collage$solid,
+								$timjs$elm_collage$Collage$thick,
+								$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+						A3($timjs$elm_collage$Collage$roundedRectangle, 60, 60, 5))),
+					A2(
 					$timjs$elm_collage$Collage$Events$onClick,
-					$author$project$Board$ClickedOn(0),
+					$author$project$Board$ClickedOn(-10),
 					A2(
 						$timjs$elm_collage$Collage$shift,
-						_Utils_Tuple2(640, 220),
+						_Utils_Tuple2(-775, 0),
+						$timjs$elm_collage$Collage$rendered(
+							A2(
+								$timjs$elm_collage$Collage$Text$size,
+								30,
+								A2(
+									$timjs$elm_collage$Collage$Text$shape,
+									$timjs$elm_collage$Collage$Text$SmallCaps,
+									A2(
+										$timjs$elm_collage$Collage$Text$color,
+										$avh4$elm_color$Color$black,
+										A2(
+											$timjs$elm_collage$Collage$Text$size,
+											$timjs$elm_collage$Collage$Text$large,
+											$timjs$elm_collage$Collage$Text$fromString('Roll')))))))),
+					A2(
+					$timjs$elm_collage$Collage$Events$onClick,
+					$author$project$Board$ClickedOn(-10),
+					A2(
+						$timjs$elm_collage$Collage$shift,
+						_Utils_Tuple2(-775, 0),
 						A2(
 							$timjs$elm_collage$Collage$styled,
 							_Utils_Tuple2(
-								$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+								$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
 								A2(
 									$timjs$elm_collage$Collage$solid,
 									$timjs$elm_collage$Collage$thick,
 									$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-							A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
+							A3($timjs$elm_collage$Collage$roundedRectangle, 115, 75, 3))))
 				]),
 			_Utils_ap(
 				_List_fromArray(
 					[
 						A2(
-						$timjs$elm_collage$Collage$Events$onClick,
-						$author$project$Board$ClickedOn(1),
-						A2(
-							$timjs$elm_collage$Collage$shift,
-							_Utils_Tuple2(535, 220),
+						$timjs$elm_collage$Collage$shift,
+						_Utils_Tuple2(0, 0),
+						$timjs$elm_collage$Collage$rendered(
 							A2(
-								$timjs$elm_collage$Collage$styled,
-								_Utils_Tuple2(
-									$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+								$timjs$elm_collage$Collage$Text$size,
+								38,
+								A2(
+									$timjs$elm_collage$Collage$Text$shape,
+									$timjs$elm_collage$Collage$Text$SmallCaps,
 									A2(
-										$timjs$elm_collage$Collage$solid,
-										$timjs$elm_collage$Collage$thick,
-										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-								A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
+										$timjs$elm_collage$Collage$Text$color,
+										$avh4$elm_color$Color$green,
+										A2(
+											$timjs$elm_collage$Collage$Text$size,
+											$timjs$elm_collage$Collage$Text$large,
+											$timjs$elm_collage$Collage$Text$fromString('64'))))))),
+						A2(
+						$timjs$elm_collage$Collage$Events$onClick,
+						$author$project$Board$ClickedOn(-10),
+						A2(
+							$timjs$elm_collage$Collage$styled,
+							_Utils_Tuple2(
+								$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+								A2(
+									$timjs$elm_collage$Collage$solid,
+									$timjs$elm_collage$Collage$thick,
+									$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+							$timjs$elm_collage$Collage$square(85)))
 					]),
 				_Utils_ap(
 					_List_fromArray(
 						[
 							A2(
 							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(0),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(640, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(1),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(535, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
 							$author$project$Board$ClickedOn(2),
 							A2(
 								$timjs$elm_collage$Collage$shift,
 								_Utils_Tuple2(430, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(3),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(325, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(4),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(220, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(5),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(115, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(11),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-640, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(10),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-535, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(9),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-430, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(8),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-325, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(7),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-220, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(6),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-115, 220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(12),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-640, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(13),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-535, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(14),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-430, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(15),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-325, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(16),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-220, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(19),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(-115, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(23),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(640, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(22),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(535, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(21),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(430, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(20),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(325, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(19),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(220, -220),
+								A2(
+									$timjs$elm_collage$Collage$styled,
+									_Utils_Tuple2(
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+										A2(
+											$timjs$elm_collage$Collage$solid,
+											$timjs$elm_collage$Collage$thick,
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+									A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
+							A2(
+							$timjs$elm_collage$Collage$Events$onClick,
+							$author$project$Board$ClickedOn(18),
+							A2(
+								$timjs$elm_collage$Collage$shift,
+								_Utils_Tuple2(115, -220),
 								A2(
 									$timjs$elm_collage$Collage$styled,
 									_Utils_Tuple2(
@@ -7212,430 +8087,52 @@ var $author$project$Board$view = function (model) {
 							[
 								A2(
 								$timjs$elm_collage$Collage$Events$onClick,
-								$author$project$Board$ClickedOn(3),
+								$author$project$Board$ClickedOn(24),
 								A2(
 									$timjs$elm_collage$Collage$shift,
-									_Utils_Tuple2(325, 220),
+									_Utils_Tuple2(0, 220),
 									A2(
 										$timjs$elm_collage$Collage$styled,
 										_Utils_Tuple2(
-											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$brown),
 											A2(
 												$timjs$elm_collage$Collage$solid,
 												$timjs$elm_collage$Collage$thick,
 												$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-										A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
+										A2($timjs$elm_collage$Collage$rectangle, 100, 440)))),
+								A2(
+								$timjs$elm_collage$Collage$Events$onClick,
+								$author$project$Board$ClickedOn(25),
+								A2(
+									$timjs$elm_collage$Collage$shift,
+									_Utils_Tuple2(0, -220),
+									A2(
+										$timjs$elm_collage$Collage$styled,
+										_Utils_Tuple2(
+											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$brown),
+											A2(
+												$timjs$elm_collage$Collage$solid,
+												$timjs$elm_collage$Collage$thick,
+												$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+										A2($timjs$elm_collage$Collage$rectangle, 100, 440))))
 							]),
-						_Utils_ap(
-							_List_fromArray(
-								[
+						_List_fromArray(
+							[
+								A2(
+								$timjs$elm_collage$Collage$styled,
+								_Utils_Tuple2(
+									$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$brown),
 									A2(
-									$timjs$elm_collage$Collage$Events$onClick,
-									$author$project$Board$ClickedOn(4),
-									A2(
-										$timjs$elm_collage$Collage$shift,
-										_Utils_Tuple2(220, 220),
-										A2(
-											$timjs$elm_collage$Collage$styled,
-											_Utils_Tuple2(
-												$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
-												A2(
-													$timjs$elm_collage$Collage$solid,
-													$timjs$elm_collage$Collage$thick,
-													$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-											A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-								]),
-							_Utils_ap(
-								_List_fromArray(
-									[
-										A2(
-										$timjs$elm_collage$Collage$Events$onClick,
-										$author$project$Board$ClickedOn(5),
-										A2(
-											$timjs$elm_collage$Collage$shift,
-											_Utils_Tuple2(115, 220),
-											A2(
-												$timjs$elm_collage$Collage$styled,
-												_Utils_Tuple2(
-													$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
-													A2(
-														$timjs$elm_collage$Collage$solid,
-														$timjs$elm_collage$Collage$thick,
-														$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-												A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-									]),
-								_Utils_ap(
-									_List_fromArray(
-										[
-											A2(
-											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(11),
-											A2(
-												$timjs$elm_collage$Collage$shift,
-												_Utils_Tuple2(-640, 220),
-												A2(
-													$timjs$elm_collage$Collage$styled,
-													_Utils_Tuple2(
-														$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
-														A2(
-															$timjs$elm_collage$Collage$solid,
-															$timjs$elm_collage$Collage$thick,
-															$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-													A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-										]),
-									_Utils_ap(
-										_List_fromArray(
-											[
-												A2(
-												$timjs$elm_collage$Collage$Events$onClick,
-												$author$project$Board$ClickedOn(10),
-												A2(
-													$timjs$elm_collage$Collage$shift,
-													_Utils_Tuple2(-535, 220),
-													A2(
-														$timjs$elm_collage$Collage$styled,
-														_Utils_Tuple2(
-															$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
-															A2(
-																$timjs$elm_collage$Collage$solid,
-																$timjs$elm_collage$Collage$thick,
-																$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-														A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-											]),
-										_Utils_ap(
-											_List_fromArray(
-												[
-													A2(
-													$timjs$elm_collage$Collage$Events$onClick,
-													$author$project$Board$ClickedOn(9),
-													A2(
-														$timjs$elm_collage$Collage$shift,
-														_Utils_Tuple2(-430, 220),
-														A2(
-															$timjs$elm_collage$Collage$styled,
-															_Utils_Tuple2(
-																$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
-																A2(
-																	$timjs$elm_collage$Collage$solid,
-																	$timjs$elm_collage$Collage$thick,
-																	$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-															A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-												]),
-											_Utils_ap(
-												_List_fromArray(
-													[
-														A2(
-														$timjs$elm_collage$Collage$Events$onClick,
-														$author$project$Board$ClickedOn(8),
-														A2(
-															$timjs$elm_collage$Collage$shift,
-															_Utils_Tuple2(-325, 220),
-															A2(
-																$timjs$elm_collage$Collage$styled,
-																_Utils_Tuple2(
-																	$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
-																	A2(
-																		$timjs$elm_collage$Collage$solid,
-																		$timjs$elm_collage$Collage$thick,
-																		$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-													]),
-												_Utils_ap(
-													_List_fromArray(
-														[
-															A2(
-															$timjs$elm_collage$Collage$Events$onClick,
-															$author$project$Board$ClickedOn(7),
-															A2(
-																$timjs$elm_collage$Collage$shift,
-																_Utils_Tuple2(-220, 220),
-																A2(
-																	$timjs$elm_collage$Collage$styled,
-																	_Utils_Tuple2(
-																		$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
-																		A2(
-																			$timjs$elm_collage$Collage$solid,
-																			$timjs$elm_collage$Collage$thick,
-																			$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																	A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-														]),
-													_Utils_ap(
-														_List_fromArray(
-															[
-																A2(
-																$timjs$elm_collage$Collage$Events$onClick,
-																$author$project$Board$ClickedOn(6),
-																A2(
-																	$timjs$elm_collage$Collage$shift,
-																	_Utils_Tuple2(-115, 220),
-																	A2(
-																		$timjs$elm_collage$Collage$styled,
-																		_Utils_Tuple2(
-																			$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
-																			A2(
-																				$timjs$elm_collage$Collage$solid,
-																				$timjs$elm_collage$Collage$thick,
-																				$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																		A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-															]),
-														_Utils_ap(
-															_List_fromArray(
-																[
-																	A2(
-																	$timjs$elm_collage$Collage$Events$onClick,
-																	$author$project$Board$ClickedOn(12),
-																	A2(
-																		$timjs$elm_collage$Collage$shift,
-																		_Utils_Tuple2(-640, -220),
-																		A2(
-																			$timjs$elm_collage$Collage$styled,
-																			_Utils_Tuple2(
-																				$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
-																				A2(
-																					$timjs$elm_collage$Collage$solid,
-																					$timjs$elm_collage$Collage$thick,
-																					$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																			A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																]),
-															_Utils_ap(
-																_List_fromArray(
-																	[
-																		A2(
-																		$timjs$elm_collage$Collage$Events$onClick,
-																		$author$project$Board$ClickedOn(13),
-																		A2(
-																			$timjs$elm_collage$Collage$shift,
-																			_Utils_Tuple2(-535, -220),
-																			A2(
-																				$timjs$elm_collage$Collage$styled,
-																				_Utils_Tuple2(
-																					$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
-																					A2(
-																						$timjs$elm_collage$Collage$solid,
-																						$timjs$elm_collage$Collage$thick,
-																						$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																				A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																	]),
-																_Utils_ap(
-																	_List_fromArray(
-																		[
-																			A2(
-																			$timjs$elm_collage$Collage$Events$onClick,
-																			$author$project$Board$ClickedOn(14),
-																			A2(
-																				$timjs$elm_collage$Collage$shift,
-																				_Utils_Tuple2(-430, -220),
-																				A2(
-																					$timjs$elm_collage$Collage$styled,
-																					_Utils_Tuple2(
-																						$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
-																						A2(
-																							$timjs$elm_collage$Collage$solid,
-																							$timjs$elm_collage$Collage$thick,
-																							$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																					A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																		]),
-																	_Utils_ap(
-																		_List_fromArray(
-																			[
-																				A2(
-																				$timjs$elm_collage$Collage$Events$onClick,
-																				$author$project$Board$ClickedOn(15),
-																				A2(
-																					$timjs$elm_collage$Collage$shift,
-																					_Utils_Tuple2(-325, -220),
-																					A2(
-																						$timjs$elm_collage$Collage$styled,
-																						_Utils_Tuple2(
-																							$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
-																							A2(
-																								$timjs$elm_collage$Collage$solid,
-																								$timjs$elm_collage$Collage$thick,
-																								$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																						A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																			]),
-																		_Utils_ap(
-																			_List_fromArray(
-																				[
-																					A2(
-																					$timjs$elm_collage$Collage$Events$onClick,
-																					$author$project$Board$ClickedOn(16),
-																					A2(
-																						$timjs$elm_collage$Collage$shift,
-																						_Utils_Tuple2(-220, -220),
-																						A2(
-																							$timjs$elm_collage$Collage$styled,
-																							_Utils_Tuple2(
-																								$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
-																								A2(
-																									$timjs$elm_collage$Collage$solid,
-																									$timjs$elm_collage$Collage$thick,
-																									$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																							A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																				]),
-																			_Utils_ap(
-																				_List_fromArray(
-																					[
-																						A2(
-																						$timjs$elm_collage$Collage$Events$onClick,
-																						$author$project$Board$ClickedOn(19),
-																						A2(
-																							$timjs$elm_collage$Collage$shift,
-																							_Utils_Tuple2(-115, -220),
-																							A2(
-																								$timjs$elm_collage$Collage$styled,
-																								_Utils_Tuple2(
-																									$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
-																									A2(
-																										$timjs$elm_collage$Collage$solid,
-																										$timjs$elm_collage$Collage$thick,
-																										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																								A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																					]),
-																				_Utils_ap(
-																					_List_fromArray(
-																						[
-																							A2(
-																							$timjs$elm_collage$Collage$Events$onClick,
-																							$author$project$Board$ClickedOn(23),
-																							A2(
-																								$timjs$elm_collage$Collage$shift,
-																								_Utils_Tuple2(640, -220),
-																								A2(
-																									$timjs$elm_collage$Collage$styled,
-																									_Utils_Tuple2(
-																										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
-																										A2(
-																											$timjs$elm_collage$Collage$solid,
-																											$timjs$elm_collage$Collage$thick,
-																											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																									A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																						]),
-																					_Utils_ap(
-																						_List_fromArray(
-																							[
-																								A2(
-																								$timjs$elm_collage$Collage$Events$onClick,
-																								$author$project$Board$ClickedOn(22),
-																								A2(
-																									$timjs$elm_collage$Collage$shift,
-																									_Utils_Tuple2(535, -220),
-																									A2(
-																										$timjs$elm_collage$Collage$styled,
-																										_Utils_Tuple2(
-																											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
-																											A2(
-																												$timjs$elm_collage$Collage$solid,
-																												$timjs$elm_collage$Collage$thick,
-																												$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																										A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																							]),
-																						_Utils_ap(
-																							_List_fromArray(
-																								[
-																									A2(
-																									$timjs$elm_collage$Collage$Events$onClick,
-																									$author$project$Board$ClickedOn(21),
-																									A2(
-																										$timjs$elm_collage$Collage$shift,
-																										_Utils_Tuple2(430, -220),
-																										A2(
-																											$timjs$elm_collage$Collage$styled,
-																											_Utils_Tuple2(
-																												$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
-																												A2(
-																													$timjs$elm_collage$Collage$solid,
-																													$timjs$elm_collage$Collage$thick,
-																													$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																											A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																								]),
-																							_Utils_ap(
-																								_List_fromArray(
-																									[
-																										A2(
-																										$timjs$elm_collage$Collage$Events$onClick,
-																										$author$project$Board$ClickedOn(20),
-																										A2(
-																											$timjs$elm_collage$Collage$shift,
-																											_Utils_Tuple2(325, -220),
-																											A2(
-																												$timjs$elm_collage$Collage$styled,
-																												_Utils_Tuple2(
-																													$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
-																													A2(
-																														$timjs$elm_collage$Collage$solid,
-																														$timjs$elm_collage$Collage$thick,
-																														$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																												A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																									]),
-																								_Utils_ap(
-																									_List_fromArray(
-																										[
-																											A2(
-																											$timjs$elm_collage$Collage$Events$onClick,
-																											$author$project$Board$ClickedOn(19),
-																											A2(
-																												$timjs$elm_collage$Collage$shift,
-																												_Utils_Tuple2(220, -220),
-																												A2(
-																													$timjs$elm_collage$Collage$styled,
-																													_Utils_Tuple2(
-																														$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
-																														A2(
-																															$timjs$elm_collage$Collage$solid,
-																															$timjs$elm_collage$Collage$thick,
-																															$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																													A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																										]),
-																									_Utils_ap(
-																										_List_fromArray(
-																											[
-																												A2(
-																												$timjs$elm_collage$Collage$Events$onClick,
-																												$author$project$Board$ClickedOn(18),
-																												A2(
-																													$timjs$elm_collage$Collage$shift,
-																													_Utils_Tuple2(115, -220),
-																													A2(
-																														$timjs$elm_collage$Collage$styled,
-																														_Utils_Tuple2(
-																															$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$red),
-																															A2(
-																																$timjs$elm_collage$Collage$solid,
-																																$timjs$elm_collage$Collage$thick,
-																																$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																														A2($timjs$elm_collage$Collage$ellipse, 45, 200))))
-																											]),
-																										_Utils_ap(
-																											_List_fromArray(
-																												[
-																													A2(
-																													$timjs$elm_collage$Collage$Events$onClick,
-																													$author$project$Board$ClickedOn(24),
-																													A2(
-																														$timjs$elm_collage$Collage$styled,
-																														_Utils_Tuple2(
-																															$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$brown),
-																															A2(
-																																$timjs$elm_collage$Collage$solid,
-																																$timjs$elm_collage$Collage$thick,
-																																$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																														A2($timjs$elm_collage$Collage$rectangle, 100, 880)))
-																												]),
-																											_List_fromArray(
-																												[
-																													A2(
-																													$timjs$elm_collage$Collage$styled,
-																													_Utils_Tuple2(
-																														$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$brown),
-																														A2(
-																															$timjs$elm_collage$Collage$solid,
-																															$timjs$elm_collage$Collage$thick,
-																															$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
-																													A2($timjs$elm_collage$Collage$rectangle, 1400, 880))
-																												])))))))))))))))))))))))))));
+										$timjs$elm_collage$Collage$solid,
+										$timjs$elm_collage$Collage$thick,
+										$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+								A2($timjs$elm_collage$Collage$rectangle, 1400, 880))
+							]))))));
 	var display = $timjs$elm_collage$Collage$Render$svg(
-		$timjs$elm_collage$Collage$Layout$stack(canvas));
+		A2(
+			$timjs$elm_collage$Collage$scale,
+			0.85,
+			$timjs$elm_collage$Collage$Layout$stack(canvas)));
 	return A2(
 		$elm$html$Html$div,
 		A2(

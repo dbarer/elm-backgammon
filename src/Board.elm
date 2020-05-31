@@ -132,8 +132,8 @@ initModel ={
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 2, vulnerable = False, player = 2},
-       {num_pieces = 0, vulnerable = False, player = 1},
-       {num_pieces = 0, vulnerable = False, player = 2}
+       {num_pieces = 2, vulnerable = False, player = 1}, --[24], 25
+       {num_pieces = 2, vulnerable = False, player = 2}  --[25], 26
        ])
    },
    dice = { roll1 = 3, roll2 = 1, sel_d1 = True, double = False},
@@ -160,7 +160,7 @@ type Msg
 legal_move : Model -> Int -> Int -> Bool
 legal_move m src dst =
   let
-    dst_check = 
+    dst_check =
       case (Array.get dst m.board.spots) of
         Nothing -> False
         Just spot ->
@@ -199,9 +199,9 @@ update_src b src =
 update_dst : Board -> Bar -> Int -> Int -> (Board , Bar)
 update_dst b bar dst pl =
   case (Array.get dst b.spots) of
-    Nothing -> (b, bar) 
+    Nothing -> (b, bar)
     Just spot ->
-      if(spot.vulnerable == False) then 
+      if(spot.vulnerable == False) then
         let
           spot1 = {spot | num_pieces = spot.num_pieces + 1}
           spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces), player = pl}
@@ -270,19 +270,21 @@ dice_val d =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Tick -> 
+    Tick ->
       (model, Cmd.none)
     Double ->
       (model, Cmd.none)
     Upd_dice d -> ({model | dice = d}, Cmd.none)
-    ClickedOn n ->      
-      let
-        legal = legal_move model n (n + (direction model.turn.player) * (dice_val model.dice))
-        tup = update_board model n
-      in
-        case legal of 
-          False -> (model, Cmd.none)
-          _ -> ({model | board = Tuple.first tup, bar = Tuple.second tup, turn = Turn (switch_turn model.turn.player)}, Random.generate Upd_dice dice_roll)
+    ClickedOn n ->
+      if (n==(-10)) then ({model | turn = Turn (switch_turn model.turn.player)}, Random.generate Upd_dice dice_roll)
+      else
+        let
+          legal = legal_move model n (n + (direction model.turn.player) * (dice_val model.dice))
+          tup = update_board model n
+        in
+          case legal of
+            False -> (model, Cmd.none)
+            _ -> ({model | board = Tuple.first tup, bar = Tuple.second tup}, Cmd.none)
 
 -- VIEW
 --puts N pieces on the given spot
@@ -304,21 +306,30 @@ makeNPieces clr spot cnt =
           -- Q3
           GT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (-640+((spot-13)*105)), toFloat (-380+((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
           EQ -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (-640+((spot-13)*105)), toFloat (-380+((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
-          -- Q4
-          LT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (115+((spot-19)*105)), toFloat (-380+((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
-
+          --Else
+          LT -> case compare 24 spot of
+            --Q4
+            GT -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (115+((spot-19)*105)), toFloat (-380+((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
+            EQ -> (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (115+((spot-19)*105)), toFloat (-380+((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
+            --Bar
+            LT -> if spot == 25 then
+                    (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (0), toFloat (100+((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
+                  else if spot == 26 then
+                    (Collage.circle 40 |> filled (uniform clr) |> shift (toFloat (0), toFloat (-100-((cnt-1)*80)))|> onClick (ClickedOn (spot-1))) :: (makeNPieces clr spot (cnt-1))
+                  else
+                    []
 -- iterates over all spots and calls makeNPieces with the proper number and color
 spotsToPieces : Int -> List Spot -> List (Collage Msg)
 spotsToPieces num spots =
   case spots of
     p::ps ->
       if p.player == 1 then
-        case compare 24 num of
+        case compare 26 num of
           GT -> makeNPieces Color.black num p.num_pieces ++ spotsToPieces (num+1) ps
           EQ -> makeNPieces Color.black num p.num_pieces ++ spotsToPieces (num+1) ps
           LT -> []
       else if p.player == 2 then
-        case compare 24 num of
+        case compare 26 num of
           GT -> makeNPieces Color.blue num p.num_pieces ++ spotsToPieces (num+1) ps
           EQ -> makeNPieces Color.blue num p.num_pieces ++ spotsToPieces (num+1) ps
           LT -> []
@@ -337,42 +348,57 @@ view model =
         , ("transform", "translate(-50%, -50%)")
         ]
       canvas =
+        --pieces on board and on bar
         spotsToPieces 1 (Array.toList model.board.spots)
+        --pieces cleared
+        --dice
+        ++[((Text.fromString (String.fromInt model.dice.roll1))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift ((toFloat (direction (model.turn.player))*272), toFloat 0)),
+           (Collage.roundedRectangle 60 60 5|> styled (uniform white, solid thick (uniform black))|> shift (toFloat ((direction (model.turn.player))*272), toFloat 0)),
+           ((Text.fromString (String.fromInt model.dice.roll2))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift ((toFloat (direction (model.turn.player))*482), toFloat 0)),
+           (Collage.roundedRectangle 60 60 5|> styled (uniform white, solid thick (uniform black))|> shift (toFloat ((direction (model.turn.player))*482), toFloat 0)),
+          -- roll button
+           ((Text.fromString ("Roll"))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift (toFloat -775, toFloat 0) |> onClick (ClickedOn (-10))),
+           (Collage.roundedRectangle 115 75 3|> styled (uniform white, solid thick (uniform black))|> shift (toFloat -775, toFloat 0) |> onClick (ClickedOn -10))]
+        --doubling cube
+        ++[((Text.fromString ("64"))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> Text.size 38 |> rendered |> shift (0, 0)),
+            (Collage.square 85|> styled (uniform white, solid thick (uniform black))|> onClick (ClickedOn (-10)))]
+          --((Text.fromString (String.fromInt model.hitCount))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> rendered |> shift (-100, -250))]
         --q1
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (640, 220)|> onClick (ClickedOn 0)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (535, 220)|> onClick (ClickedOn 1)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (430, 220)|> onClick (ClickedOn 2)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (325, 220)|> onClick (ClickedOn 3)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (220, 220)|> onClick (ClickedOn 4)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (115, 220)|> onClick (ClickedOn 5)]
+        ++[(Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (640, 220)|> onClick (ClickedOn 0)),
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (535, 220)|> onClick (ClickedOn 1)),
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (430, 220)|> onClick (ClickedOn 2)),
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (325, 220)|> onClick (ClickedOn 3)),
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (220, 220)|> onClick (ClickedOn 4)),
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (115, 220)|> onClick (ClickedOn 5)),
         --q2
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-640, 220)|> onClick (ClickedOn 11)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-535, 220)|> onClick (ClickedOn 10)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-430, 220)|> onClick (ClickedOn 9)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-325, 220)|> onClick (ClickedOn 8)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-220, 220)|> onClick (ClickedOn 7)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-115, 220)|> onClick (ClickedOn 6)]
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-640, 220)|> onClick (ClickedOn 11)),
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-535, 220)|> onClick (ClickedOn 10)),
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-430, 220)|> onClick (ClickedOn 9)),
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-325, 220)|> onClick (ClickedOn 8)),
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-220, 220)|> onClick (ClickedOn 7)),
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-115, 220)|> onClick (ClickedOn 6)),
         --q3
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-640, -220)|> onClick (ClickedOn 12)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-535, -220)|> onClick (ClickedOn 13)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-430, -220)|> onClick (ClickedOn 14)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-325, -220)|> onClick (ClickedOn 15)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-220, -220)|> onClick (ClickedOn 16)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-115, -220)|> onClick (ClickedOn 19)]
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-640, -220)|> onClick (ClickedOn 12)),
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-535, -220)|> onClick (ClickedOn 13)),
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-430, -220)|> onClick (ClickedOn 14)),
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-325, -220)|> onClick (ClickedOn 15)),
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (-220, -220)|> onClick (ClickedOn 16)),
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (-115, -220)|> onClick (ClickedOn 19)),
         --q4
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (640, -220)|> onClick (ClickedOn 23)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (535, -220)|> onClick (ClickedOn 22)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (430, -220)|> onClick (ClickedOn 21)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (325, -220)|> onClick (ClickedOn 20)]
-        ++[Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (220, -220)|> onClick (ClickedOn 19)]
-        ++[Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (115, -220)|> onClick (ClickedOn 18)]
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (640, -220)|> onClick (ClickedOn 23)),
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (535, -220)|> onClick (ClickedOn 22)),
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (430, -220)|> onClick (ClickedOn 21)),
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (325, -220)|> onClick (ClickedOn 20)),
+        (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (220, -220)|> onClick (ClickedOn 19)),
+        (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (115, -220)|> onClick (ClickedOn 18))]
         --background and bar
-        ++[Collage.rectangle 100 880|> styled (uniform brown, solid thick (uniform black))|> onClick (ClickedOn 24)]
+        ++[(Collage.rectangle 100 440|> styled (uniform brown, solid thick (uniform black))|> shift (0, 220)|> onClick (ClickedOn 24)),
+           (Collage.rectangle 100 440|> styled (uniform brown, solid thick (uniform black))|> shift (0, -220)|> onClick (ClickedOn 25))]
         ++[Collage.rectangle 1400 880|> styled (uniform brown, solid thick (uniform black))]
 
       display =
         -- Html.text (Debug.toString (model.hitCount, model.missCount))
-        svg (stack canvas)
+        svg ((stack canvas) |> scale 0.85)
 
     in
       Html.div (List.map (\(k, v) -> Attr.style k v) styles) [display]
