@@ -5306,7 +5306,7 @@ var $author$project$Board$initModel = {
 					{num_pieces: 0, player: 0, vulnerable: false},
 					{num_pieces: 0, player: 0, vulnerable: false},
 					{num_pieces: 2, player: 2, vulnerable: false},
-					{num_pieces: 0, player: 1, vulnerable: false},
+					{num_pieces: 0, player: 2, vulnerable: false},
 					{num_pieces: 0, player: 2, vulnerable: false}
 				]))
 	},
@@ -6180,7 +6180,7 @@ var $author$project$Board$update_board = F2(
 			$author$project$Board$legal_move,
 			mod,
 			n,
-			n + $author$project$Board$select_dice(mod.dice))) ? _Utils_Tuple2(mod.board, mod.bar) : (mod.dice._double ? _Debug_todo(
+			n + ($author$project$Board$direction(mod.turn.player) * $author$project$Board$select_dice(mod.dice)))) ? _Utils_Tuple2(mod.board, mod.bar) : (mod.dice._double ? _Debug_todo(
 			'Board',
 			{
 				start: {line: 253, column: 42},
@@ -7771,7 +7771,7 @@ var $author$project$Board$view = function (model) {
 											$timjs$elm_collage$Collage$Text$fromString('64'))))))),
 						A2(
 						$timjs$elm_collage$Collage$Events$onClick,
-						$author$project$Board$ClickedOn(-10),
+						$author$project$Board$ClickedOn(-20),
 						A2(
 							$timjs$elm_collage$Collage$styled,
 							_Utils_Tuple2(

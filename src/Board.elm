@@ -132,7 +132,7 @@ initModel ={
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 2, vulnerable = False, player = 2},
-       {num_pieces = 0, vulnerable = False, player = 1}, --[24], 25
+       {num_pieces = 0, vulnerable = False, player = 2}, --[24], 25
        {num_pieces = 0, vulnerable = False, player = 2}  --[25], 26
        ])
    },
@@ -174,7 +174,7 @@ legal_move m src dst =
         Just spot ->
           case compare (spot.player) m.turn.player of
             EQ -> True
-            _ -> False
+            _ ->  False
   in
     dst_check && src_check
 
@@ -249,7 +249,7 @@ direction n =
 
 update_board : Model -> Int -> (Board , Bar)
 update_board mod n =
-  if(legal_move mod n (n + (select_dice mod.dice)) == False) then (mod.board, mod.bar)
+  if(legal_move mod n (n + ((direction mod.turn.player)*(select_dice mod.dice))) == False) then (mod.board, mod.bar)
   else if (mod.dice.double == True) then Debug.todo "Double"
   else
    update_dst (update_src mod.board n) mod.bar (n + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
@@ -281,7 +281,7 @@ update msg model =
       else if (n==(-12)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = False, double = model.dice.double}}, Cmd.none)
       else
         let
-          legal = legal_move model n (n + (direction model.turn.player) * (dice_val model.dice))
+          legal = legal_move model n (n + ((direction model.turn.player) * (dice_val model.dice)))
           tup = update_board model n
         in
           case legal of
