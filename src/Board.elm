@@ -201,13 +201,7 @@ update_dst b bar dst pl =
   case (Array.get dst b.spots) of
     Nothing -> (b, bar)
     Just spot ->
-      if(spot.vulnerable == False) then
-        let
-          spot1 = {spot | num_pieces = spot.num_pieces + 1}
-          spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces), player = pl}
-        in
-          (Board (Array.set dst spot2 b.spots) , bar)
-      else
+      if(spot.vulnerable == True && spot.player /= pl ) then
         let
           spot1 = {spot | player = pl}
           w = bar.whites
@@ -227,6 +221,12 @@ update_dst b bar dst pl =
             Just spot2 -> {spot2 | num_pieces = spot2.num_pieces + 1}
         in
           (Board (Array.set bar_index bar_spot (Array.set dst spot1 b.spots)), bars)
+      else
+        let
+          spot1 = {spot | num_pieces = spot.num_pieces + 1}
+          spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces), player = pl}
+        in
+          (Board (Array.set dst spot2 b.spots) , bar)
 
 select_dice : Dice -> Int
 select_dice d =
