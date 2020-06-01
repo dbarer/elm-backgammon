@@ -132,8 +132,8 @@ initModel ={
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 2, vulnerable = False, player = 2},
-       {num_pieces = 2, vulnerable = False, player = 1}, --[24], 25
-       {num_pieces = 2, vulnerable = False, player = 2}  --[25], 26
+       {num_pieces = 0, vulnerable = False, player = 1}, --[24], 25
+       {num_pieces = 0, vulnerable = False, player = 2}  --[25], 26
        ])
    },
    dice = { roll1 = 3, roll2 = 1, sel_d1 = True, double = False},
@@ -277,6 +277,8 @@ update msg model =
     Upd_dice d -> ({model | dice = d}, Cmd.none)
     ClickedOn n ->
       if (n==(-10)) then ({model | turn = Turn (switch_turn model.turn.player)}, Random.generate Upd_dice dice_roll)
+      else if (n==(-11)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = True, double = model.dice.double}}, Cmd.none)
+      else if (n==(-12)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = False, double = model.dice.double}}, Cmd.none)
       else
         let
           legal = legal_move model n (n + (direction model.turn.player) * (dice_val model.dice))
@@ -337,6 +339,16 @@ spotsToPieces num spots =
         spotsToPieces (num+1) ps
     [] -> []
 
+selectedCursor : Bool -> Int -> Collage Msg
+selectedCursor d1Sel playerDir =
+  let
+    d1Pos = 272
+    d2Pos = 482
+  in
+    if d1Sel then
+      (Collage.roundedRectangle 62 62 5|> styled (transparent, solid thick (uniform green))|> shift ((toFloat (playerDir)*d1Pos), toFloat 0))
+    else
+      (Collage.roundedRectangle 62 62 5|> styled (transparent, solid thick (uniform green))|> shift ((toFloat (playerDir)*d2Pos), toFloat 0))
 view : Model -> Html Msg
 view model =
     -- https://css-tricks.com/quick-css-trick-how-to-center-an-object-exactly-in-the-center/
@@ -352,16 +364,19 @@ view model =
         spotsToPieces 1 (Array.toList model.board.spots)
         --pieces cleared
         --dice
-        ++[((Text.fromString (String.fromInt model.dice.roll1))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift ((toFloat (direction (model.turn.player))*272), toFloat 0)),
-           (Collage.roundedRectangle 60 60 5|> styled (uniform white, solid thick (uniform black))|> shift (toFloat ((direction (model.turn.player))*272), toFloat 0)),
-           ((Text.fromString (String.fromInt model.dice.roll2))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift ((toFloat (direction (model.turn.player))*482), toFloat 0)),
-           (Collage.roundedRectangle 60 60 5|> styled (uniform white, solid thick (uniform black))|> shift (toFloat ((direction (model.turn.player))*482), toFloat 0)),
-          -- roll button
+        ++[-- selected window
+           selectedCursor (model.dice.sel_d1) (direction (model.turn.player)),
+           -- Dice
+           ((Text.fromString (String.fromInt model.dice.roll1))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift ((toFloat (direction (model.turn.player))*272), toFloat 0) |> onClick (ClickedOn -11)),
+           (Collage.roundedRectangle 60 60 5|> styled (uniform white, solid thick (uniform black))|> shift (toFloat ((direction (model.turn.player))*272), toFloat 0)|> onClick (ClickedOn -11)),
+           ((Text.fromString (String.fromInt model.dice.roll2))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift ((toFloat (direction (model.turn.player))*482), toFloat 0)|> onClick (ClickedOn -12)),
+           (Collage.roundedRectangle 60 60 5|> styled (uniform white, solid thick (uniform black))|> shift (toFloat ((direction (model.turn.player))*482), toFloat 0) |> onClick (ClickedOn -12)),
+           -- roll button
            ((Text.fromString ("Roll"))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift (toFloat -775, toFloat 0) |> onClick (ClickedOn (-10))),
            (Collage.roundedRectangle 115 75 3|> styled (uniform white, solid thick (uniform black))|> shift (toFloat -775, toFloat 0) |> onClick (ClickedOn -10))]
         --doubling cube
         ++[((Text.fromString ("64"))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> Text.size 38 |> rendered |> shift (0, 0)),
-            (Collage.square 85|> styled (uniform white, solid thick (uniform black))|> onClick (ClickedOn (-10)))]
+            (Collage.square 85|> styled (uniform white, solid thick (uniform black))|> onClick (ClickedOn (-20)))]
         --q1
         ++[(Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (640, 220)|> onClick (ClickedOn 0)),
         (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (535, 220)|> onClick (ClickedOn 1)),
