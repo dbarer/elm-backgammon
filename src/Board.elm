@@ -132,7 +132,7 @@ initModel ={
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 2, vulnerable = False, player = 2},
-       {num_pieces = 0, vulnerable = False, player = 2}, --[24], 25
+       {num_pieces = 0, vulnerable = False, player = 1}, --[24], 25
        {num_pieces = 0, vulnerable = False, player = 2}  --[25], 26
        ])
    },
@@ -165,9 +165,16 @@ legal_move m src dst =
         Nothing -> False
         Just spot ->
           case compare (spot.num_pieces) 1 of
-            GT -> False
-            EQ -> True
             LT -> True
+            EQ -> True
+            GT ->
+              let
+                p = m.turn.player
+              in      
+                case compare p spot.player of
+                  EQ -> True
+                  _ -> False
+    
     src_check  =
       case (Array.get src m.board.spots) of
         Nothing -> False
@@ -178,6 +185,66 @@ legal_move m src dst =
   in
     dst_check && src_check
 
+
+
+
+beared_get : Int ->  Array.Array Spot -> Int  -> Int
+beared_get n xs pl =
+  case Array.get n xs of
+    Nothing -> 0
+    Just spot ->
+      case compare pl spot.player of
+        EQ -> spot.num_pieces
+        _ -> 0
+
+
+{-
+barred_chk : Model -> Int -> Bool
+barred_chk  m pl =
+  case pl of
+    1 ->
+      case (Array.get 24 m.board.spots).num_pieces of
+        0 -> False
+        _ -> True
+    2 ->
+      case (Array.get 25 m.board.spots).num_pieces of
+        0 -> False
+        _ -> True
+
+
+-}
+beared : Model -> Int -> Bool
+beared m pl =
+  case pl of
+    1 ->
+      let
+        s1 = (beared_get 18 m.board.spots 1)
+        s2 = (beared_get 19 m.board.spots 1)
+        s3 = (beared_get 20 m.board.spots 1)
+        s4 = (beared_get 21 m.board.spots 1)
+        s5 = (beared_get 22 m.board.spots 1)
+        s6 = (beared_get 23 m.board.spots 1)
+        s7 = m.score.p1
+        tot = s1 + s2 + s3 + s4 + s5 + s6 + s7
+      in
+        case tot of
+          18 -> True
+          _ -> False
+    2 ->
+      let
+        s1 = (beared_get 1 m.board.spots 2)
+        s2 = (beared_get 2 m.board.spots 2)
+        s3 = (beared_get 3 m.board.spots 2)
+        s4 = (beared_get 4 m.board.spots 2)
+        s5 = (beared_get 5 m.board.spots 2)
+        s6 = (beared_get 6 m.board.spots 2)
+        s7 = m.score.p2
+        tot = s1 + s2 + s3 + s4 + s5 + s6 + s7
+      in
+        case tot of
+          18 -> True
+          _ -> False
+    _ -> False
 
 update_vul : Int -> Bool
 update_vul n =
@@ -196,21 +263,14 @@ update_src b src =
       in
         Board (Array.set src spot2 b.spots)
 
-update_dst : Board -> Bar -> Int -> Int -> (Board , Bar)
-update_dst b bar dst pl =
+update_dst : Board ->  Int -> Int -> Board
+update_dst b dst pl =
   case (Array.get dst b.spots) of
-    Nothing -> (b, bar)
+    Nothing -> b
     Just spot ->
       if(spot.vulnerable == True && spot.player /= pl ) then
         let
           spot1 = {spot | player = pl}
-          w = bar.whites
-          bl = bar.blacks
-          bars =
-            case pl of
-              1 -> {bar | blacks = bl + 1}
-              2 -> {bar | whites = w + 1}
-              _ -> bar
           bar_index  =
             case pl of
               1 -> 25
@@ -220,14 +280,26 @@ update_dst b bar dst pl =
             Nothing -> spot1
             Just spot2 -> {spot2 | num_pieces = spot2.num_pieces + 1}
         in
-          (Board (Array.set bar_index bar_spot (Array.set dst spot1 b.spots)), bars)
+          (Board (Array.set bar_index bar_spot (Array.set dst spot1 b.spots)))
       else
         let
           spot1 = {spot | num_pieces = spot.num_pieces + 1}
           spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces), player = pl}
         in
-          (Board (Array.set dst spot2 b.spots) , bar)
-
+          (Board (Array.set dst spot2 b.spots))
+{-
+barred_move : Board -> Int -> Int -> Board
+barred_move b n pl
+  case pl of
+    1 ->
+      let
+        upd_src = Array.get 24 b.spots
+        new_src = {upd_src | num_pieces = upd_src.num_pieces - 1}
+        upd_dst = Array.get n b.spots
+        new_dst = {upd_dst | num_pieces = upd_dst.num_pieces + 1, player = p}l
+    2 -> 
+    _ -> b
+-}
 select_dice : Dice -> Int
 select_dice d =
   case d.sel_d1 of
@@ -247,12 +319,18 @@ direction n =
     2 -> -1
     _ -> 1
 
-update_board : Model -> Int -> (Board , Bar)
+update_board : Model -> Int -> Board
 update_board mod n =
-  if(legal_move mod n (n + ((direction mod.turn.player)*(select_dice mod.dice))) == False) then (mod.board, mod.bar)
+  if(legal_move mod n (n + ((direction mod.turn.player)*(select_dice mod.dice))) == False) then mod.board
   else if (mod.dice.double == True) then Debug.todo "Double"
   else
-   update_dst (update_src mod.board n) mod.bar (n + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
+    let
+      src = (update_src mod.board n)
+    in
+      case n of
+        24 -> update_dst src (select_dice mod.dice) mod.turn.player
+        25 -> update_dst src (n - 1 + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
+        _ -> update_dst src (n + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
 
 switch_turn : Int -> Int
 switch_turn n =
@@ -281,12 +359,20 @@ update msg model =
       else if (n==(-12)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = False, double = model.dice.double}}, Cmd.none)
       else
         let
+          barred = case model.turn.player of
+             1 -> model.p1.barred
+             2 -> model.p2.barred
+             _ -> False   
           legal = legal_move model n (n + ((direction model.turn.player) * (dice_val model.dice)))
-          tup = update_board model n
+          barred_brd = model.board
+          brd = update_board model n
         in
-          case legal of
-            False -> (model, Cmd.none)
-            _ -> ({model | board = Tuple.first tup, bar = Tuple.second tup}, Cmd.none)
+          case barred of
+            True -> ({model | board = barred_brd}, Cmd.none)
+            False ->
+              case legal of
+                False -> (model, Cmd.none)
+                _ -> ({model | board = brd }, Cmd.none)
 
 -- VIEW
 --puts N pieces on the given spot
