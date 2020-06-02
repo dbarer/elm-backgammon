@@ -95,8 +95,7 @@ type alias Model =
   { board : Board,
     dice : Dice,
     bar : Bar,
-    p1 : Player,
-    p2 : Player,
+    players : List Player,
     score : Score,
     turn : Turn
     }
@@ -133,13 +132,14 @@ initModel ={
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 2, vulnerable = False, player = 2},
        {num_pieces = 0, vulnerable = False, player = 1}, --[24], 25
-       {num_pieces = 0, vulnerable = False, player = 2}  --[25], 26
+       {num_pieces = 0, vulnerable = False, player = 2},  --[25], 26
+       {num_pieces = 0, vulnerable = False, player = 1}, -- [26], 27  Score p1 
+       {num_pieces = 0, vulnerable = False, player = 2} --[27], 28 Score p2
        ])
    },
    dice = { roll1 = 3, roll2 = 1, sel_d1 = True, double = False},
    bar = {whites = 0, blacks = 0},
-   p1 = {player_num = 1, beared = False, barred = False},
-   p2 = {player_num = 2, beared = False, barred = False},
+   players = [{player_num = 1, beared = False, barred = False}, {player_num = 2, beared = False, barred = False}],
    score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = True},
    turn = {player = 1}
   }
@@ -165,8 +165,6 @@ legal_move m src dst =
         Nothing -> False
         Just spot ->
           case compare (spot.num_pieces) 1 of
-            LT -> True
-            EQ -> True
             GT ->
               let
                 p = m.turn.player
@@ -174,6 +172,7 @@ legal_move m src dst =
                 case compare p spot.player of
                   EQ -> True
                   _ -> False
+            _ -> True
     
     src_check  =
       case (Array.get src m.board.spots) of
@@ -321,16 +320,28 @@ direction n =
 
 update_board : Model -> Int -> Board
 update_board mod n =
-  if(legal_move mod n (n + ((direction mod.turn.player)*(select_dice mod.dice))) == False) then mod.board
-  else if (mod.dice.double == True) then Debug.todo "Double"
+  if (n + (direction mod.turn.player * (select_dice mod.dice)) < 0 ) then
+    update_dst (update_src mod.board n) 27 mod.turn.player
+  else if (n + (direction mod.turn.player * (select_dice mod.dice)) > 23) then
+    update_dst (update_src mod.board n) 26 mod.turn.player
   else
     let
-      src = (update_src mod.board n)
+      legal = 
+        case n of
+          24 -> legal_move mod n ((select_dice mod.dice) - 1)
+          25 -> legal_move mod n (n-1 + (direction mod.turn.player) * select_dice mod.dice)
+          _ -> legal_move mod n (n + ((direction mod.turn.player)*(select_dice mod.dice))) 
     in
-      case n of
-        24 -> update_dst src (select_dice mod.dice) mod.turn.player
-        25 -> update_dst src (n - 1 + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
-        _ -> update_dst src (n + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
+      if (legal == False) then mod.board
+      else if (mod.dice.double == True) then Debug.todo "Double"
+      else
+        let
+          src = (update_src mod.board n)
+        in
+          case n of
+            24 -> update_dst src ((select_dice mod.dice) - 1) mod.turn.player
+            25 -> update_dst src (n - 1 + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
+            _ -> update_dst src (n + (direction mod.turn.player) * select_dice mod.dice) mod.turn.player
 
 switch_turn : Int -> Int
 switch_turn n =
@@ -344,6 +355,37 @@ dice_val d =
  case d.sel_d1 of
         True -> d.roll1
         _ -> d.roll2
+
+p_access : Model -> Player
+p_access m  =
+  let
+    generic = Player 1 False False 
+  in
+    case m.turn.player of
+      1 -> case (List.head m.players) of
+        Nothing -> generic
+        Just p -> p
+      2 -> case (List.tail m.players) of
+        Nothing -> generic
+        Just xs -> case List.head xs of
+          Nothing -> generic
+          Just p -> p
+      _ -> generic
+
+ispbar : Model -> Bool
+ispbar m =
+  case m.turn.player of
+    1 -> case (Array.get 24 m.board.spots) of
+      Nothing -> False
+      Just s -> case s.num_pieces of
+        0 -> False
+        _ -> True
+    2 -> case (Array.get 25 m.board.spots) of
+      Nothing -> False
+      Just s -> case s.num_pieces of
+        0 -> False
+        _ -> True
+    _ -> False
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -359,20 +401,15 @@ update msg model =
       else if (n==(-12)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = False, double = model.dice.double}}, Cmd.none)
       else
         let
-          barred = case model.turn.player of
-             1 -> model.p1.barred
-             2 -> model.p2.barred
-             _ -> False   
-          legal = legal_move model n (n + ((direction model.turn.player) * (dice_val model.dice)))
+          barred = ispbar model -- (p_access model).barred
+          --beared = p_access model.beared
+          legal = True -- legal_move model n (n + ((direction model.turn.player) * (dice_val model.dice)))
           barred_brd = model.board
           brd = update_board model n
         in
-          case barred of
-            True -> ({model | board = barred_brd}, Cmd.none)
-            False ->
-              case legal of
-                False -> (model, Cmd.none)
-                _ -> ({model | board = brd }, Cmd.none)
+          case legal of
+            False -> (model, Cmd.none)
+            _ -> ({model | board = brd}, Cmd.none)
 
 -- VIEW
 --puts N pieces on the given spot
