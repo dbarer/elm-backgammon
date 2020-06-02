@@ -83,7 +83,7 @@ type alias Score =
   p1 : Int,
   p2 : Int,
   doubled_val : Int,
-  dbl_p1_ctrl : Bool
+  dbl_p1_ctrl : Int
   }
 
 type alias Turn =
@@ -140,7 +140,7 @@ initModel ={
    dice = { roll1 = 3, roll2 = 1, sel_d1 = True, double = False},
    bar = {whites = 0, blacks = 0},
    players = [{player_num = 1, beared = False, barred = False}, {player_num = 2, beared = False, barred = False}],
-   score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = True},
+   score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = 0},
    turn = {player = 1}
   }
 
