@@ -131,10 +131,10 @@ initModel ={
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 0, vulnerable = False, player = 0},
        {num_pieces = 2, vulnerable = False, player = 2},
-       {num_pieces = 0, vulnerable = False, player = 1}, --[24], 25
-       {num_pieces = 0, vulnerable = False, player = 2},  --[25], 26
-       {num_pieces = 0, vulnerable = False, player = 1}, -- [26], 27  Score p1 
-       {num_pieces = 0, vulnerable = False, player = 2} --[27], 28 Score p2
+       {num_pieces = 0, vulnerable = False, player = 1}, --[24], ClickedOn 25, Bar p1
+       {num_pieces = 0, vulnerable = False, player = 2}, --[25], ClickedOn 26, Bar p2
+       {num_pieces = 0, vulnerable = False, player = 1}, --[26], ClickedOn 27, Score p1
+       {num_pieces = 0, vulnerable = False, player = 2}  --[27], ClickedOn 28, Score p2
        ])
    },
    dice = { roll1 = 3, roll2 = 1, sel_d1 = True, double = False},
@@ -168,12 +168,12 @@ legal_move m src dst =
             GT ->
               let
                 p = m.turn.player
-              in      
+              in
                 case compare p spot.player of
                   EQ -> True
                   _ -> False
             _ -> True
-    
+
     src_check  =
       case (Array.get src m.board.spots) of
         Nothing -> False
@@ -212,6 +212,7 @@ barred_chk  m pl =
 
 
 -}
+
 beared : Model -> Int -> Bool
 beared m pl =
   case pl of
@@ -286,6 +287,7 @@ update_dst b dst pl =
           spot2 = {spot1 | vulnerable = (update_vul spot1.num_pieces), player = pl}
         in
           (Board (Array.set dst spot2 b.spots))
+
 {-
 barred_move : Board -> Int -> Int -> Board
 barred_move b n pl
@@ -296,9 +298,10 @@ barred_move b n pl
         new_src = {upd_src | num_pieces = upd_src.num_pieces - 1}
         upd_dst = Array.get n b.spots
         new_dst = {upd_dst | num_pieces = upd_dst.num_pieces + 1, player = p}l
-    2 -> 
+    2 ->
     _ -> b
 -}
+
 select_dice : Dice -> Int
 select_dice d =
   case d.sel_d1 of
@@ -326,11 +329,11 @@ update_board mod n =
     update_dst (update_src mod.board n) 26 mod.turn.player
   else
     let
-      legal = 
+      legal =
         case n of
           24 -> legal_move mod n ((select_dice mod.dice) - 1)
           25 -> legal_move mod n (n-1 + (direction mod.turn.player) * select_dice mod.dice)
-          _ -> legal_move mod n (n + ((direction mod.turn.player)*(select_dice mod.dice))) 
+          _ -> legal_move mod n (n + ((direction mod.turn.player)*(select_dice mod.dice)))
     in
       if (legal == False) then mod.board
       else if (mod.dice.double == True) then Debug.todo "Double"
@@ -359,7 +362,7 @@ dice_val d =
 p_access : Model -> Player
 p_access m  =
   let
-    generic = Player 1 False False 
+    generic = Player 1 False False
   in
     case m.turn.player of
       1 -> case (List.head m.players) of
@@ -399,6 +402,7 @@ update msg model =
       if (n==(-10)) then ({model | turn = Turn (switch_turn model.turn.player)}, Random.generate Upd_dice dice_roll)
       else if (n==(-11)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = True, double = model.dice.double}}, Cmd.none)
       else if (n==(-12)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = False, double = model.dice.double}}, Cmd.none)
+      else if (n==(-20)) then (model, Cmd.none)
       else
         let
           barred = ispbar model -- (p_access model).barred
@@ -472,6 +476,22 @@ selectedCursor d1Sel playerDir =
       (Collage.roundedRectangle 62 62 5|> styled (transparent, solid thick (uniform green))|> shift ((toFloat (playerDir)*d1Pos), toFloat 0))
     else
       (Collage.roundedRectangle 62 62 5|> styled (transparent, solid thick (uniform green))|> shift ((toFloat (playerDir)*d2Pos), toFloat 0))
+
+renderOffBlack : Int -> List (Collage Msg)
+renderOffBlack cnt =
+  if cnt > 0 then
+    (Collage.circle 40 |> styled (uniform black, solid thick (uniform blue)) |> shift (toFloat (750), toFloat (-420+((cnt-1)*27)))) :: renderOffBlack (cnt-1)
+  else
+    []
+
+renderOffBlue : Int -> List (Collage Msg)
+renderOffBlue cnt =
+  if cnt > 0 then
+    (Collage.circle 40 |> styled (uniform blue, solid thick (uniform black)) |> shift (toFloat (750), toFloat (420-((cnt-1)*27)))) :: renderOffBlue (cnt-1)
+  else
+    []
+
+
 view : Model -> Html Msg
 view model =
     -- https://css-tricks.com/quick-css-trick-how-to-center-an-object-exactly-in-the-center/
@@ -485,7 +505,15 @@ view model =
       canvas =
         --pieces on board and on bar
         spotsToPieces 1 (Array.toList model.board.spots)
-        --pieces cleared
+        --pieces cleared and score
+        ++ renderOffBlack ((Maybe.withDefault ({num_pieces = 0, vulnerable = False, player = 0}) (Array.get 26 model.board.spots)).num_pieces)
+        ++ renderOffBlue ((Maybe.withDefault ({num_pieces = 0, vulnerable = False, player = 0}) (Array.get 27 model.board.spots)).num_pieces)
+        ++[((Text.fromString (String.fromInt ((Maybe.withDefault ({num_pieces = 0, vulnerable = False, player = 0}) (Array.get 26 model.board.spots)).num_pieces)))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 32 |> rendered |> shift (toFloat 820, toFloat -220)),
+           ((Text.fromString (String.fromInt ((Maybe.withDefault ({num_pieces = 0, vulnerable = False, player = 0}) (Array.get 27 model.board.spots)).num_pieces)))|> Text.size Text.large |> Text.color Color.blue |> Text.shape Text.SmallCaps |> Text.size 32 |> rendered |> shift (toFloat 820, toFloat 220)),
+           ((Text.fromString ("Games Won:"))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 32 |> rendered |> shift (toFloat -820, toFloat -220)),
+           ((Text.fromString ("Games Won:"))|> Text.size Text.large |> Text.color Color.blue |> Text.shape Text.SmallCaps |> Text.size 32 |> rendered |> shift (toFloat -820, toFloat 260)),
+           ((Text.fromString (String.fromInt (model.score.p1)))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 32 |> rendered |> shift (toFloat -820, toFloat -260)),
+           ((Text.fromString (String.fromInt (model.score.p2)))|> Text.size Text.large |> Text.color Color.blue |> Text.shape Text.SmallCaps |> Text.size 32 |> rendered |> shift (toFloat -820, toFloat 220))]
         --dice
         ++[-- selected window
            selectedCursor (model.dice.sel_d1) (direction (model.turn.player)),
@@ -495,11 +523,11 @@ view model =
            ((Text.fromString (String.fromInt model.dice.roll2))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift ((toFloat (direction (model.turn.player))*482), toFloat 0)|> onClick (ClickedOn -12)),
            (Collage.roundedRectangle 60 60 5|> styled (uniform white, solid thick (uniform black))|> shift (toFloat ((direction (model.turn.player))*482), toFloat 0) |> onClick (ClickedOn -12)),
            -- roll button
-           ((Text.fromString ("Roll"))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift (toFloat -775, toFloat 0) |> onClick (ClickedOn (-10))),
-           (Collage.roundedRectangle 115 75 3|> styled (uniform white, solid thick (uniform black))|> shift (toFloat -775, toFloat 0) |> onClick (ClickedOn -10))]
+           ((Text.fromString ("Roll"))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift (toFloat -820, toFloat 0) |> onClick (ClickedOn (-10))),
+           (Collage.roundedRectangle 115 75 3|> styled (uniform white, solid thick (uniform black))|> shift (toFloat -820, toFloat 0) |> onClick (ClickedOn -10))]
         --doubling cube
-        ++[((Text.fromString ("64"))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> Text.size 38 |> rendered |> shift (0, 0)),
-            (Collage.square 85|> styled (uniform white, solid thick (uniform black))|> onClick (ClickedOn (-20)))]
+        ++[((Text.fromString ("64"))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> Text.size 38 |> rendered |> shift (toFloat 0, toFloat (220*model.score.dbl_p1_ctrl))),
+            (Collage.square 85|> styled (uniform white, solid thick (uniform black))|> shift (toFloat 0, toFloat (220*model.score.dbl_p1_ctrl)) |> onClick (ClickedOn (-20)))]
         --q1
         ++[(Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (640, 220)|> onClick (ClickedOn 0)),
         (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (535, 220)|> onClick (ClickedOn 1)),
@@ -530,12 +558,12 @@ view model =
         (Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (115, -220)|> onClick (ClickedOn 18))]
         --background and bar
         ++[(Collage.rectangle 100 440|> styled (uniform brown, solid thick (uniform black))|> shift (0, 220)|> onClick (ClickedOn 24)),
-           (Collage.rectangle 100 440|> styled (uniform brown, solid thick (uniform black))|> shift (0, -220)|> onClick (ClickedOn 25))]
-        ++[Collage.rectangle 1400 880|> styled (uniform brown, solid thick (uniform black))]
+           (Collage.rectangle 100 440|> styled (uniform brown, solid thick (uniform black))|> shift (0, -220)|> onClick (ClickedOn 25)),
+           (Collage.rectangle 1400 880|> styled (uniform brown, solid thick (uniform black)))]
 
       display =
         -- Html.text (Debug.toString (model.hitCount, model.missCount))
-        svg ((stack canvas) |> scale 0.85)
+        svg ((stack canvas) |> scale 0.8)
 
     in
       Html.div (List.map (\(k, v) -> Attr.style k v) styles) [display]
