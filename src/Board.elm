@@ -17,7 +17,6 @@ import Collage.Layout exposing (stack)
 import Collage.Render exposing (svg)
 import Collage.Events exposing (onClick)
 import Collage.Text as Text exposing (Text, fromString, size, color, shape)
-import Dice exposing (..)
 
 ----------------------------------------------------------------------
 
@@ -88,11 +87,14 @@ type alias Score =
 
 type alias Turn =
   {
+    --moves_left : Int,
+    --d1_used : Bool,
     player : Int
   }
 
 type alias Model =
-  { board : Board,
+  {
+    board : Board,
     dice : Dice,
     bar : Bar,
     players : List Player,
@@ -155,6 +157,7 @@ type Msg
   = Double
   | ClickedOn Int
   | Tick
+  | Upd_score
   | Upd_dice Dice
 
 legal_move : Model -> Int -> Int -> Bool
@@ -197,22 +200,6 @@ beared_get n xs pl =
         _ -> 0
 
 
-{-
-barred_chk : Model -> Int -> Bool
-barred_chk  m pl =
-  case pl of
-    1 ->
-      case (Array.get 24 m.board.spots).num_pieces of
-        0 -> False
-        _ -> True
-    2 ->
-      case (Array.get 25 m.board.spots).num_pieces of
-        0 -> False
-        _ -> True
-
-
--}
-
 beared : Model -> Int -> Bool
 beared m pl =
   case pl of
@@ -228,7 +215,7 @@ beared m pl =
         tot = s1 + s2 + s3 + s4 + s5 + s6 + s7
       in
         case tot of
-          18 -> True
+          15 -> True
           _ -> False
     2 ->
       let
@@ -242,7 +229,7 @@ beared m pl =
         tot = s1 + s2 + s3 + s4 + s5 + s6 + s7
       in
         case tot of
-          18 -> True
+          15 -> True
           _ -> False
     _ -> False
 
@@ -397,9 +384,33 @@ update msg model =
       (model, Cmd.none)
     Double ->
       (model, Cmd.none)
-    Upd_dice d -> ({model | dice = d}, Cmd.none)
+    Upd_dice d ->
+      if (d.roll1 == d.roll2) then ({model | dice = {d | double = True}}, Cmd.none)
+      else 
+        ({model | dice = {d | double = False}}, Cmd.none)
+    Upd_score ->
+      let
+        doubled = model.score.doubled_val
+        p1won = case (Array.get 26 model.board.spots) of
+          Nothing -> 0
+          Just spot ->
+            case spot.num_pieces of
+              15 -> doubled
+              _ -> 0
+        p2won = case (Array.get 27 model.board.spots) of
+            Nothing -> 0
+            Just spot ->
+              case spot.num_pieces of
+                15 -> doubled
+                _ -> 0
+        tmp_sc = model.score
+        sco = {tmp_sc | p1 = tmp_sc.p1 + p1won, p2 = tmp_sc.p2 + p2won}
+      in
+        if(p1won == 0 && p2won ==0) then (model, Cmd.none)
+        else
+          ({initModel | score = sco}, Cmd.none)
     ClickedOn n ->
-      if (n==(-10)) then ({model | turn = Turn (switch_turn model.turn.player)}, Random.generate Upd_dice dice_roll)
+      if (n==(-10)) then ({model | turn =  Turn (switch_turn model.turn.player) }, Random.generate Upd_dice dice_roll)
       else if (n==(-11)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = True, double = model.dice.double}}, Cmd.none)
       else if (n==(-12)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = False, double = model.dice.double}}, Cmd.none)
       else if (n==(-20)) then (model, Cmd.none)
@@ -413,7 +424,7 @@ update msg model =
         in
           case legal of
             False -> (model, Cmd.none)
-            _ -> ({model | board = brd}, Cmd.none)
+            _ -> update Upd_score {model | board = brd}
 
 -- VIEW
 --puts N pieces on the given spot
