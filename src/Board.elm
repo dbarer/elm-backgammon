@@ -410,13 +410,21 @@ update msg model =
           Nothing -> 0
           Just spot ->
             case spot.num_pieces of
-              15 -> doubled
+              15 -> case (Array.get 27 model.board.spots) of
+                Nothing -> doubled
+                Just spot2 -> case spot2.num_pieces of
+                  0 -> 2 * doubled
+                  _ -> doubled
               _ -> 0
         p2won = case (Array.get 27 model.board.spots) of
             Nothing -> 0
             Just spot ->
               case spot.num_pieces of
-                15 -> doubled
+                15 -> case (Array.get 26 model.board.spots) of
+                  Nothing -> doubled
+                  Just spot2 -> case spot2.num_pieces of
+                    0 -> 2 * doubled
+                    _ -> doubled
                 _ -> 0
         tmp_sc = model.score
         sco = {tmp_sc | p1 = tmp_sc.p1 + p1won, p2 = tmp_sc.p2 + p2won}
@@ -475,13 +483,13 @@ update msg model =
             ({initModel | score = {p1 = (model.score.p1 + model.score.doubled_val), p2 = model.score.p2, doubled_val = 1, dbl_p1_ctrl = 0, new_double = False}}, Cmd.none)
         else
           (model, Cmd.none)
-      {-else if (noMove model) then
+      else if (noMove model) then
        -- Debug.log "no" ( toString (noMove model))
          let
            trn = model.turn
          in
-           Debug.log "Hello"
-           ({model | turn = {trn | moves_left = 0}}, Cmd.none) -}
+           -- Debug.log "Hello"
+           ({model | turn = {trn | moves_left = 0}}, Cmd.none) 
       else
         let
           brd = update_board model n
