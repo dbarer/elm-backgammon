@@ -144,7 +144,7 @@ init () =
 -- UPDATE
 
 type Msg
-  = 
+  =
   ClickedOn Int
   | Tick
   | Upd_score
@@ -367,12 +367,16 @@ noMove model =
           0 -> False
           _ -> True
         r1_p1 = case (Maybe.withDefault (Spot 0 False 0) (Array.get model.dice.roll1 model.board.spots)) of
-          spot1 -> ((spot1.num_pieces > 1) && (spot1.player /= model.turn.player))
+          spot1 -> ((spot1.num_pieces > 1) && (spot1.player /= 1))
         r2_p1 = case (Maybe.withDefault (Spot 0 False 0) (Array.get model.dice.roll2 model.board.spots)) of
-          spot1 -> ((spot1.num_pieces > 1) && (spot1.player /= model.turn.player))
+          spot1 -> ((spot1.num_pieces > 1) && (spot1.player /= 1))
       in
         case model.turn.moves_left of
-          1 -> barred && (r1_p1 || r2_p1)
+          0 -> True
+          1 -> if (not model.turn.d1_used) then
+                  barred && (r1_p1)
+                else
+                  barred && (r2_p1)
           _ -> barred && r1_p1 && r2_p1
     2 ->
       let
@@ -380,12 +384,16 @@ noMove model =
           0 -> False
           _ -> True
         r1_p2 = case (Maybe.withDefault (Spot 0 False 0) (Array.get (24 - model.dice.roll1) model.board.spots)) of
-          spot1 -> ((spot1.num_pieces > 0) && (spot1.player /= model.turn.player))
+          spot1 -> ((spot1.num_pieces > 1) && (spot1.player /= 2))
         r2_p2 = case (Maybe.withDefault (Spot 0 False 0) (Array.get (24 - model.dice.roll2) model.board.spots)) of
-          spot1 -> ((spot1.num_pieces > 0) && (spot1.player /= model.turn.player))
+          spot1 -> ((spot1.num_pieces > 1) && (spot1.player /= 2))
       in
         case model.turn.moves_left of
-          1 -> barred && (r1_p2 || r2_p2)
+          0 -> True
+          1 -> if (not model.turn.d1_used) then
+                  barred && (r1_p2)
+                else
+                  barred && (r2_p2)
           _ -> barred && r1_p2 && r2_p2
     _ -> False
 
@@ -434,10 +442,10 @@ update msg model =
           ({initModel | score = sco}, Cmd.none)
     ClickedOn n ->
       if (n==(-10)) then
-        if (model.turn.moves_left == 0 ) then
+        if ((model.turn.moves_left == 0) || (noMove model)) then
           let
             sc = model.score
-          in  
+          in
             ({model | turn =  Turn 2 False (switch_turn model.turn.player), score = {sc | new_double = False  }}, Random.generate Upd_dice dice_roll)
         else (model, Cmd.none)
       else if (n==(-11)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = True, double = model.dice.double}}, Cmd.none)
@@ -478,7 +486,7 @@ update msg model =
         --p2Forfeit
         if (model.turn.player == 2 || (model.turn.player == 1 && model.score.new_double == True)) then
           if (model.score.new_double == True) then
-            ({initModel | score = {p1 = (model.score.p1 + (model.score.doubled_val // 2)), p2 = model.score.p2, doubled_val = 1, dbl_p1_ctrl = 0, new_double = False}}, Cmd.none)    
+            ({initModel | score = {p1 = (model.score.p1 + (model.score.doubled_val // 2)), p2 = model.score.p2, doubled_val = 1, dbl_p1_ctrl = 0, new_double = False}}, Cmd.none)
           else
             ({initModel | score = {p1 = (model.score.p1 + model.score.doubled_val), p2 = model.score.p2, doubled_val = 1, dbl_p1_ctrl = 0, new_double = False}}, Cmd.none)
         else
@@ -488,8 +496,8 @@ update msg model =
          let
            trn = model.turn
          in
-           -- Debug.log "Hello"
-           ({model | turn = {trn | moves_left = 0}}, Cmd.none) 
+           Debug.log "Stuck Case"
+           ({model | turn = {trn | moves_left = 0}}, Cmd.none)
       else
         let
           brd = update_board model n
