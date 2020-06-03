@@ -219,7 +219,7 @@ beared m pl =
         s4 = (beared_get 21 m.board.spots 1)
         s5 = (beared_get 22 m.board.spots 1)
         s6 = (beared_get 23 m.board.spots 1)
-        s7 = m.score.p1
+        s7 = (beared_get 26 m.board.spots 1)
         tot = s1 + s2 + s3 + s4 + s5 + s6 + s7
       in
         case tot of
@@ -227,13 +227,13 @@ beared m pl =
           _ -> False
     2 ->
       let
-        s1 = (beared_get 1 m.board.spots 2)
-        s2 = (beared_get 2 m.board.spots 2)
-        s3 = (beared_get 3 m.board.spots 2)
-        s4 = (beared_get 4 m.board.spots 2)
-        s5 = (beared_get 5 m.board.spots 2)
-        s6 = (beared_get 6 m.board.spots 2)
-        s7 = m.score.p2
+        s1 = (beared_get 0 m.board.spots 2)
+        s2 = (beared_get 1 m.board.spots 2)
+        s3 = (beared_get 2 m.board.spots 2)
+        s4 = (beared_get 3 m.board.spots 2)
+        s5 = (beared_get 4 m.board.spots 2)
+        s6 = (beared_get 5 m.board.spots 2)
+        s7 = (beared_get 27 m.board.spots 2)
         tot = s1 + s2 + s3 + s4 + s5 + s6 + s7
       in
         case tot of
@@ -435,7 +435,7 @@ update msg model =
                     _ -> doubled
                 _ -> 0
         tmp_sc = model.score
-        sco = {tmp_sc | p1 = tmp_sc.p1 + p1won, p2 = tmp_sc.p2 + p2won}
+        sco = {tmp_sc | p1 = tmp_sc.p1 + p1won, p2 = tmp_sc.p2 + p2won, doubled_val=1, dbl_p1_ctrl=0, new_double=False}
       in
         if(p1won == 0 && p2won ==0) then (model, Cmd.none)
         else
@@ -692,7 +692,7 @@ keyDecoder =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model = Time.every 50 (\t -> Tick)
+subscriptions model = Time.every 5000 (\t -> Tick)
 
 -- subscriptions : Model -> Sub Msg
 -- subscriptions model =

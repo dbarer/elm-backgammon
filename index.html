@@ -5909,7 +5909,7 @@ var $elm$time$Time$every = F2(
 var $author$project$Board$subscriptions = function (model) {
 	return A2(
 		$elm$time$Time$every,
-		50,
+		5000,
 		function (t) {
 			return $author$project$Board$Tick;
 		});
@@ -5990,7 +5990,7 @@ var $author$project$Board$noMove = function (model) {
 				var _v4 = A2(
 					$elm$core$Maybe$withDefault,
 					A3($author$project$Board$Spot, 0, false, 0),
-					A2($elm$core$Array$get, model.dice.roll2, model.board.spots));
+					A2($elm$core$Array$get, model.dice.roll2 - 1, model.board.spots));
 				var spot1 = _v4;
 				return (spot1.num_pieces > 1) && (spot1.player !== 1);
 			}();
@@ -5998,7 +5998,7 @@ var $author$project$Board$noMove = function (model) {
 				var _v3 = A2(
 					$elm$core$Maybe$withDefault,
 					A3($author$project$Board$Spot, 0, false, 0),
-					A2($elm$core$Array$get, model.dice.roll1, model.board.spots));
+					A2($elm$core$Array$get, model.dice.roll1 - 1, model.board.spots));
 				var spot1 = _v3;
 				return (spot1.num_pieces > 1) && (spot1.player !== 1);
 			}();
@@ -6100,7 +6100,7 @@ var $author$project$Board$beared = F2(
 	function (m, pl) {
 		switch (pl) {
 			case 1:
-				var s7 = m.score.p1;
+				var s7 = A3($author$project$Board$beared_get, 26, m.board.spots, 1);
 				var s6 = A3($author$project$Board$beared_get, 23, m.board.spots, 1);
 				var s5 = A3($author$project$Board$beared_get, 22, m.board.spots, 1);
 				var s4 = A3($author$project$Board$beared_get, 21, m.board.spots, 1);
@@ -6114,13 +6114,13 @@ var $author$project$Board$beared = F2(
 					return false;
 				}
 			case 2:
-				var s7 = m.score.p2;
-				var s6 = A3($author$project$Board$beared_get, 6, m.board.spots, 2);
-				var s5 = A3($author$project$Board$beared_get, 5, m.board.spots, 2);
-				var s4 = A3($author$project$Board$beared_get, 4, m.board.spots, 2);
-				var s3 = A3($author$project$Board$beared_get, 3, m.board.spots, 2);
-				var s2 = A3($author$project$Board$beared_get, 2, m.board.spots, 2);
-				var s1 = A3($author$project$Board$beared_get, 1, m.board.spots, 2);
+				var s7 = A3($author$project$Board$beared_get, 27, m.board.spots, 2);
+				var s6 = A3($author$project$Board$beared_get, 5, m.board.spots, 2);
+				var s5 = A3($author$project$Board$beared_get, 4, m.board.spots, 2);
+				var s4 = A3($author$project$Board$beared_get, 3, m.board.spots, 2);
+				var s3 = A3($author$project$Board$beared_get, 2, m.board.spots, 2);
+				var s2 = A3($author$project$Board$beared_get, 1, m.board.spots, 2);
+				var s1 = A3($author$project$Board$beared_get, 0, m.board.spots, 2);
 				var tot = (((((s1 + s2) + s3) + s4) + s5) + s6) + s7;
 				if (tot === 15) {
 					return true;
@@ -6156,7 +6156,7 @@ var $author$project$Board$legal_move = F3(
 			if ((m.turn.moves_left === 1) && _Utils_eq(m.turn.d1_used, m.dice.sel_d1)) {
 				return false;
 			} else {
-				if ((m.turn.player === 1) && ((dst === 25) || (dst === 24))) {
+				if (A2($elm$core$Debug$log, 'mess', (m.turn.player === 1) && ((dst === 25) || (dst === 24)))) {
 					return false;
 				} else {
 					if ((A2(
@@ -6501,12 +6501,12 @@ var $author$project$Board$update = F2(
 					}();
 					var sco = _Utils_update(
 						tmp_sc,
-						{p1: tmp_sc.p1 + p1won, p2: tmp_sc.p2 + p2won});
+						{dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: tmp_sc.p1 + p1won, p2: tmp_sc.p2 + p2won});
 					return ((!p1won) && (!p2won)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 						_Utils_update(
 							$author$project$Board$initModel,
 							{score: sco}),
-						$elm$core$Platform$Cmd$none);
+						A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll));
 				default:
 					var n = msg.a;
 					if (_Utils_eq(n, -10)) {
@@ -6582,13 +6582,13 @@ var $author$project$Board$update = F2(
 												{
 													score: {dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: model.score.p1, p2: model.score.p2 + ((model.score.doubled_val / 2) | 0)}
 												}),
-											$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+											A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll)) : _Utils_Tuple2(
 											_Utils_update(
 												$author$project$Board$initModel,
 												{
 													score: {dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: model.score.p1, p2: model.score.p2 + model.score.doubled_val}
 												}),
-											$elm$core$Platform$Cmd$none)) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+											A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll))) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 									} else {
 										if (_Utils_eq(n, -32)) {
 											return ((model.turn.player === 2) || ((model.turn.player === 1) && model.score.new_double)) ? (model.score.new_double ? _Utils_Tuple2(
@@ -6597,13 +6597,13 @@ var $author$project$Board$update = F2(
 													{
 														score: {dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: model.score.p1 + ((model.score.doubled_val / 2) | 0), p2: model.score.p2}
 													}),
-												$elm$core$Platform$Cmd$none) : _Utils_Tuple2(
+												A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll)) : _Utils_Tuple2(
 												_Utils_update(
 													$author$project$Board$initModel,
 													{
 														score: {dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: model.score.p1 + model.score.doubled_val, p2: model.score.p2}
 													}),
-												$elm$core$Platform$Cmd$none)) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+												A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll))) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 										} else {
 											if ($author$project$Board$noMove(model)) {
 												var trn = model.turn;
