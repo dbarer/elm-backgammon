@@ -190,13 +190,13 @@ initModel ={
 
 init : Flags -> (Model, Cmd Msg)
 init () =
-  (initModel, Cmd.none)
+  (initModel, Random.generate Upd_dice dice_roll)
 
 -- UPDATE
 
 type Msg
-  = Double
-  | ClickedOn Int
+  = 
+  ClickedOn Int
   | Tick
   | Upd_score
   | Upd_dice Dice
@@ -217,6 +217,7 @@ legal_move : Model -> Int -> Int -> Bool
 legal_move m src dst =
   if (m.turn.moves_left <= 0) then False
   else if (m.turn.moves_left == 1 && (m.turn.d1_used == m.dice.sel_d1)) then False
+  else if (m.turn.player == 1 && (dst == 25 || dst == 24)) then False
   else if ((Maybe.withDefault (Spot 0 False 0) (Array.get (bar_loc m.turn.player)  m.board.spots)).num_pieces) > 0 && (src /= (bar_loc m.turn.player)) then False
   else if ((not (beared m m.turn.player)) && (dst == out_loc m.turn.player)) then False
   else
@@ -406,27 +407,45 @@ p_access m  =
           Just p -> p
       _ -> generic
 
-ispbar : Model -> Bool
-ispbar m =
-  case m.turn.player of
-    1 -> case (Array.get 24 m.board.spots) of
-      Nothing -> False
-      Just s -> case s.num_pieces of
-        0 -> False
-        _ -> True
-    2 -> case (Array.get 25 m.board.spots) of
-      Nothing -> False
-      Just s -> case s.num_pieces of
-        0 -> False
-        _ -> True
+
+
+noMove : Model -> Bool
+noMove model =
+  case model.turn.player of
+    1 ->
+      let
+        barred = case (Maybe.withDefault (Spot 0 False 0) (Array.get (bar_loc 1) model.board.spots)).num_pieces of
+          0 -> False
+          _ -> True
+        r1_p1 = case (Maybe.withDefault (Spot 0 False 0) (Array.get model.dice.roll1 model.board.spots)) of
+          spot1 -> ((spot1.num_pieces > 1) && (spot1.player /= model.turn.player))
+        r2_p1 = case (Maybe.withDefault (Spot 0 False 0) (Array.get model.dice.roll2 model.board.spots)) of
+          spot1 -> ((spot1.num_pieces > 1) && (spot1.player /= model.turn.player))
+      in
+        case model.turn.moves_left of
+          1 -> barred && (r1_p1 || r2_p1)
+          _ -> barred && r1_p1 && r2_p1
+    2 ->
+      let
+        barred = case (Maybe.withDefault (Spot 0 False 0) (Array.get (bar_loc 2) model.board.spots)).num_pieces of
+          0 -> False
+          _ -> True
+        r1_p2 = case (Maybe.withDefault (Spot 0 False 0) (Array.get (24 - model.dice.roll1) model.board.spots)) of
+          spot1 -> ((spot1.num_pieces > 0) && (spot1.player /= model.turn.player))
+        r2_p2 = case (Maybe.withDefault (Spot 0 False 0) (Array.get (24 - model.dice.roll2) model.board.spots)) of
+          spot1 -> ((spot1.num_pieces > 0) && (spot1.player /= model.turn.player))
+      in
+        case model.turn.moves_left of
+          1 -> barred && (r1_p2 || r2_p2)
+          _ -> barred && r1_p2 && r2_p2
     _ -> False
+
+
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick ->
-      (model, Cmd.none)
-    Double ->
       (model, Cmd.none)
     Upd_dice d ->
       let
@@ -458,7 +477,7 @@ update msg model =
           ({initModel | score = sco}, Cmd.none)
     ClickedOn n ->
       if (n==(-10)) then
-        if (model.turn.moves_left == 0) then
+        if (model.turn.moves_left == 0 ) then
           ({model | turn =  Turn 2 False (switch_turn model.turn.player)  }, Random.generate Upd_dice dice_roll)
         else (model, Cmd.none)
       else if (n==(-11)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = True, double = model.dice.double}}, Cmd.none)
@@ -498,17 +517,23 @@ update msg model =
           ({initModel | score = {p1 = (model.score.p1 + model.score.doubled_val), p2 = model.score.p2, doubled_val = 1, dbl_p1_ctrl = 0}}, Cmd.none)
         else
           (model, Cmd.none)
+      {-else if (noMove model) then
+       -- Debug.log "no" ( toString (noMove model))
+         let
+           trn = model.turn
+         in
+           Debug.log "Hello"
+           ({model | turn = {trn | moves_left = 0}}, Cmd.none) -}
       else
         let
-          barred = ispbar model -- (p_access model).barred
-          --beared = p_access model.beared
           brd = update_board model n
           legal = not(brd == model.board)
           trn = model.turn
           m_dice = model.dice
           d1_play = model.dice.sel_d1
-          selection = case trn.moves_left of
-            1 -> not (trn.d1_used)
+          moves = trn.moves_left - 1
+          selection = case moves of
+            1 -> not (d1_play)
             _ -> m_dice.sel_d1
 
         in
