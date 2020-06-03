@@ -52,11 +52,6 @@ type alias Player =
   barred : Bool
   }
 
-type alias Bar =
-  {
-  whites : Int,
-  blacks : Int
-  }
 
 type alias Dice =
   {
@@ -66,10 +61,6 @@ type alias Dice =
   double : Bool
   }
 
-set_double : Int -> Int -> Bool
-set_double r1 r2 =
-  if (r1 == r2) then True
-  else False
 
 type alias Move =
   {
@@ -81,6 +72,7 @@ type alias Score =
   {
   p1 : Int,
   p2 : Int,
+  new_double : Bool,
   doubled_val : Int,
   dbl_p1_ctrl : Int
   }
@@ -96,7 +88,6 @@ type alias Model =
   {
     board : Board,
     dice : Dice,
-    bar : Bar,
     players : List Player,
     score : Score,
     turn : Turn
@@ -105,47 +96,6 @@ type alias Model =
 
 type alias Flags =
   ()
-
-
-fakeModel ={
-   board = {
-     spots = Array.fromList ([
-       {num_pieces = 2, vulnerable = False, player = 1},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 5, vulnerable = False, player = 2},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 3, vulnerable = False, player = 2},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 5, vulnerable = False, player = 1},
-       {num_pieces = 5, vulnerable = False, player = 2},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 3, vulnerable = False, player = 1},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 12, vulnerable = False, player = 1},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 2, vulnerable = False, player = 1},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 0, vulnerable = False, player = 0},
-       {num_pieces = 2, vulnerable = False, player = 2},
-       {num_pieces = 0, vulnerable = False, player = 1}, --[24], ClickedOn 25, Bar p1
-       {num_pieces = 0, vulnerable = False, player = 2}, --[25], ClickedOn 26, Bar p2
-       {num_pieces = 0, vulnerable = False, player = 1}, --[26], ClickedOn 27, Score p1
-       {num_pieces = 0, vulnerable = False, player = 2}  --[27], ClickedOn 28, Score p2
-       ])
-   },
-   dice = { roll1 = 3, roll2 = 1, sel_d1 = True, double = False},
-   bar = {whites = 0, blacks = 0},
-   players = [{player_num = 1, beared = False, barred = False}, {player_num = 2, beared = False, barred = False}],
-   score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = 0},
-   turn = {moves_left = 2, d1_used = False, player = 1}
-  }
 
 initModel ={
    board = {
@@ -181,9 +131,8 @@ initModel ={
        ])
    },
    dice = { roll1 = 3, roll2 = 1, sel_d1 = True, double = False},
-   bar = {whites = 0, blacks = 0},
    players = [{player_num = 1, beared = False, barred = False}, {player_num = 2, beared = False, barred = False}],
-   score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = 0},
+   score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = 0, new_double = False},
    turn = {moves_left = 2, d1_used = False, player = 1}
   }
 
@@ -478,7 +427,10 @@ update msg model =
     ClickedOn n ->
       if (n==(-10)) then
         if (model.turn.moves_left == 0 ) then
-          ({model | turn =  Turn 2 False (switch_turn model.turn.player)  }, Random.generate Upd_dice dice_roll)
+          let
+            sc = model.score
+          in  
+            ({model | turn =  Turn 2 False (switch_turn model.turn.player), score = {sc | new_double = False  }}, Random.generate Upd_dice dice_roll)
         else (model, Cmd.none)
       else if (n==(-11)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = True, double = model.dice.double}}, Cmd.none)
       else if (n==(-12)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = False, double = model.dice.double}}, Cmd.none)
@@ -487,34 +439,40 @@ update msg model =
           --if nobody has the cube
           if (model.turn.player == 1) then
             -- p1 doubles
-            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (2), dbl_p1_ctrl = 1}}, Cmd.none)
+            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (2), dbl_p1_ctrl = 1, new_double = True}}, Cmd.none)
           else
             -- p2 doubles
-            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (2), dbl_p1_ctrl = -1}}, Cmd.none)
+            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (2), dbl_p1_ctrl = -1, new_double = True}}, Cmd.none)
         else if (model.score.dbl_p1_ctrl == 1) then
           --if p2 has the cube
           if (model.turn.player == 2) then
-            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (model.score.doubled_val * 2), dbl_p1_ctrl = -1}}, Cmd.none)
+            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, new_double = True,  doubled_val = (model.score.doubled_val * 2), dbl_p1_ctrl = -1}}, Cmd.none)
           else
             (model, Cmd.none)
         else if (model.score.dbl_p1_ctrl == -1) then
           --if p1 has the cube
           if (model.turn.player == 1) then
-            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (model.score.doubled_val * 2), dbl_p1_ctrl = 1}}, Cmd.none)
+            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (model.score.doubled_val * 2), dbl_p1_ctrl = 1, new_double = True}}, Cmd.none)
           else
             (model, Cmd.none)
         else
           (model, Cmd.none)
       else if (n==(-31)) then
         --p1Forfeit
-        if (model.turn.player == 1) then
-          ({initModel | score = {p1 = model.score.p1, p2 = (model.score.p2 + model.score.doubled_val), doubled_val = 1, dbl_p1_ctrl = 0}}, Cmd.none)
+        if (model.turn.player == 1 || (model.turn.player == 2 && model.score.new_double == True)) then
+          if (model.score.new_double == True) then
+            ({initModel | score = {p1 = model.score.p1, p2 = (model.score.p2 + (model.score.doubled_val // 2)), doubled_val = 1, dbl_p1_ctrl = 0, new_double = False}}, Cmd.none)
+          else
+            ({initModel | score = {p1 = model.score.p1, p2 = (model.score.p2 + model.score.doubled_val), doubled_val = 1, dbl_p1_ctrl = 0, new_double = False}}, Cmd.none)
         else
           (model, Cmd.none)
       else if (n==(-32)) then
         --p2Forfeit
-        if (model.turn.player == 2) then
-          ({initModel | score = {p1 = (model.score.p1 + model.score.doubled_val), p2 = model.score.p2, doubled_val = 1, dbl_p1_ctrl = 0}}, Cmd.none)
+        if (model.turn.player == 2 || (model.turn.player == 1 && model.score.new_double == True)) then
+          if (model.score.new_double == True) then
+            ({initModel | score = {p1 = (model.score.p1 + (model.score.doubled_val // 2)), p2 = model.score.p2, doubled_val = 1, dbl_p1_ctrl = 0, new_double = False}}, Cmd.none)    
+          else
+            ({initModel | score = {p1 = (model.score.p1 + model.score.doubled_val), p2 = model.score.p2, doubled_val = 1, dbl_p1_ctrl = 0, new_double = False}}, Cmd.none)
         else
           (model, Cmd.none)
       {-else if (noMove model) then
