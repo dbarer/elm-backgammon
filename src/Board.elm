@@ -183,7 +183,7 @@ initModel ={
    dice = { roll1 = 3, roll2 = 1, sel_d1 = True, double = False},
    bar = {whites = 0, blacks = 0},
    players = [{player_num = 1, beared = False, barred = False}, {player_num = 2, beared = False, barred = False}],
-   score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = 0},
+   score = {p1 = 0, p2 = 0, doubled_val = 64, dbl_p1_ctrl = 0},
    turn = {moves_left = 2, d1_used = False, player = 1}
   }
 
@@ -219,7 +219,7 @@ legal_move m src dst =
   else if (m.turn.moves_left == 1 && (m.turn.d1_used == m.dice.sel_d1)) then False
   else if ((Maybe.withDefault (Spot 0 False 0) (Array.get (bar_loc m.turn.player)  m.board.spots)).num_pieces) > 0 && (src /= (bar_loc m.turn.player)) then False
   else if ((not (beared m m.turn.player)) && (dst == out_loc m.turn.player)) then False
-  else 
+  else
     let
       spts = m.board.spots
       dst_check =
@@ -430,10 +430,10 @@ update msg model =
       (model, Cmd.none)
     Upd_dice d ->
       let
-        tn = model.turn 
-      in        
+        tn = model.turn
+      in
         if (d.roll1 == d.roll2) then ({model | dice = {d | double = True}, turn = {tn | moves_left = 4}}, Cmd.none)
-        else 
+        else
           ({model | dice = {d | double = False}}, Cmd.none)
     Upd_score ->
       let
@@ -460,7 +460,29 @@ update msg model =
       if (n==(-10)) then ({model | turn =  Turn 2 False (switch_turn model.turn.player)  }, Random.generate Upd_dice dice_roll)
       else if (n==(-11)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = True, double = model.dice.double}}, Cmd.none)
       else if (n==(-12)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = False, double = model.dice.double}}, Cmd.none)
-      else if (n==(-20)) then (model, Cmd.none)
+      else if (n==(-20)) then
+        if (model.score.dbl_p1_ctrl == 0) then
+          --if nobody has the cube
+          if (model.turn.player == 1) then
+            -- p1 doubles
+            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (2), dbl_p1_ctrl = 1}}, Cmd.none)
+          else
+            -- p2 doubles
+            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (2), dbl_p1_ctrl = -1}}, Cmd.none)
+        else if (model.score.dbl_p1_ctrl == 1) then
+          --if p2 has the cube
+          if (model.turn.player == 2) then
+            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (model.score.doubled_val * 2), dbl_p1_ctrl = -1}}, Cmd.none)
+          else
+            (model, Cmd.none)
+        else if (model.score.dbl_p1_ctrl == -1) then
+          --if p1 has the cube
+          if (model.turn.player == 1) then
+            ({model | score = {p1 = model.score.p1, p2 = model.score.p2, doubled_val = (model.score.doubled_val * 2), dbl_p1_ctrl = 1}}, Cmd.none)
+          else
+            (model, Cmd.none)
+        else
+          (model, Cmd.none)
       else
         let
           barred = ispbar model -- (p_access model).barred
@@ -530,6 +552,13 @@ spotsToPieces num spots =
         spotsToPieces (num+1) ps
     [] -> []
 
+turnCursor : Int -> Collage Msg
+turnCursor player =
+  if (player == 1) then
+    (Collage.roundedRectangle 200 100 5|> styled (transparent, solid thick (uniform green))|> shift (toFloat -820, toFloat -240))
+  else
+    (Collage.roundedRectangle 200 100 5|> styled (transparent, solid thick (uniform green))|> shift (toFloat -820, toFloat 240))
+
 selectedCursor : Bool -> Int -> Collage Msg
 selectedCursor d1Sel playerDir =
   let
@@ -581,6 +610,7 @@ view model =
         --dice
         ++[-- selected window
            selectedCursor (model.dice.sel_d1) (direction (model.turn.player)),
+           turnCursor (model.turn.player),
            -- Dice
            ((Text.fromString (String.fromInt model.dice.roll1))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift ((toFloat (direction (model.turn.player))*272), toFloat 0) |> onClick (ClickedOn -11)),
            (Collage.roundedRectangle 60 60 5|> styled (uniform white, solid thick (uniform black))|> shift (toFloat ((direction (model.turn.player))*272), toFloat 0)|> onClick (ClickedOn -11)),
@@ -590,8 +620,8 @@ view model =
            ((Text.fromString ("Roll"))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift (toFloat -820, toFloat 0) |> onClick (ClickedOn (-10))),
            (Collage.roundedRectangle 115 75 3|> styled (uniform white, solid thick (uniform black))|> shift (toFloat -820, toFloat 0) |> onClick (ClickedOn -10))]
         --doubling cube
-        ++[((Text.fromString ("64"))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> Text.size 38 |> rendered |> shift (toFloat 0, toFloat (220*model.score.dbl_p1_ctrl))),
-            (Collage.square 85|> styled (uniform white, solid thick (uniform black))|> shift (toFloat 0, toFloat (220*model.score.dbl_p1_ctrl)) |> onClick (ClickedOn (-20)))]
+        ++[((Text.fromString (String.fromInt model.score.doubled_val))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> Text.size 38 |> rendered |> shift (toFloat 0, toFloat (360*model.score.dbl_p1_ctrl)) |> onClick (ClickedOn (-20))),
+            (Collage.square 85|> styled (uniform white, solid thick (uniform black))|> shift (toFloat 0, toFloat (360*model.score.dbl_p1_ctrl)) |> onClick (ClickedOn (-20)))]
         --q1
         ++[(Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (640, 220)|> onClick (ClickedOn 0)),
         (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (535, 220)|> onClick (ClickedOn 1)),
