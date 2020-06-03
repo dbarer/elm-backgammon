@@ -1,4 +1,4 @@
-module Board exposing (..)
+module Backgammon exposing (..)
 
 -- Add/modify imports if you'd like. ---------------------------------
 

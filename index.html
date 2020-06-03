@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Board</title>
+  <title>Backgammon</title>
   <style>body { padding: 0; margin: 0; }</style>
 </head>
 
@@ -5241,10 +5241,10 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Board$Upd_dice = function (a) {
+var $author$project$Backgammon$Upd_dice = function (a) {
 	return {$: 'Upd_dice', a: a};
 };
-var $author$project$Board$Dice = F4(
+var $author$project$Backgammon$Dice = F4(
 	function (roll1, roll2, sel_d1, _double) {
 		return {_double: _double, roll1: roll1, roll2: roll2, sel_d1: sel_d1};
 	});
@@ -5320,11 +5320,11 @@ var $elm$random$Random$map2 = F3(
 					seed2);
 			});
 	});
-var $author$project$Board$dice_roll = A3(
+var $author$project$Backgammon$dice_roll = A3(
 	$elm$random$Random$map2,
 	F2(
 		function (x, y) {
-			return A4($author$project$Board$Dice, x, y, true, false);
+			return A4($author$project$Backgammon$Dice, x, y, true, false);
 		}),
 	A2($elm$random$Random$int, 1, 6),
 	A2($elm$random$Random$int, 1, 6));
@@ -5457,7 +5457,7 @@ var $elm$core$Array$fromList = function (list) {
 		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
 	}
 };
-var $author$project$Board$initModel = {
+var $author$project$Backgammon$initModel = {
 	board: {
 		spots: $elm$core$Array$fromList(
 			_List_fromArray(
@@ -5501,12 +5501,12 @@ var $author$project$Board$initModel = {
 	score: {dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: 0, p2: 0},
 	turn: {d1_used: false, moves_left: 2, player: 1}
 };
-var $author$project$Board$init = function (_v0) {
+var $author$project$Backgammon$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Board$initModel,
-		A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll));
+		$author$project$Backgammon$initModel,
+		A2($elm$random$Random$generate, $author$project$Backgammon$Upd_dice, $author$project$Backgammon$dice_roll));
 };
-var $author$project$Board$Tick = {$: 'Tick'};
+var $author$project$Backgammon$Tick = {$: 'Tick'};
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 'Every', a: a, b: b};
@@ -5906,19 +5906,19 @@ var $elm$time$Time$every = F2(
 		return $elm$time$Time$subscription(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
-var $author$project$Board$subscriptions = function (model) {
+var $author$project$Backgammon$subscriptions = function (model) {
 	return A2(
 		$elm$time$Time$every,
 		5000,
 		function (t) {
-			return $author$project$Board$Tick;
+			return $author$project$Backgammon$Tick;
 		});
 };
-var $author$project$Board$Turn = F3(
+var $author$project$Backgammon$Turn = F3(
 	function (moves_left, d1_used, player) {
 		return {d1_used: d1_used, moves_left: moves_left, player: player};
 	});
-var $author$project$Board$Upd_score = {$: 'Upd_score'};
+var $author$project$Backgammon$Upd_score = {$: 'Upd_score'};
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
@@ -5960,11 +5960,11 @@ var $elm$core$Array$get = F2(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
 var $elm$core$Debug$log = _Debug_log;
-var $author$project$Board$Spot = F3(
+var $author$project$Backgammon$Spot = F3(
 	function (num_pieces, vulnerable, player) {
 		return {num_pieces: num_pieces, player: player, vulnerable: vulnerable};
 	});
-var $author$project$Board$bar_loc = function (pl) {
+var $author$project$Backgammon$bar_loc = function (pl) {
 	if (pl === 1) {
 		return 24;
 	} else {
@@ -5982,14 +5982,14 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Board$noMove = function (model) {
+var $author$project$Backgammon$noMove = function (model) {
 	var _v0 = model.turn.player;
 	switch (_v0) {
 		case 1:
 			var r2_p1 = function () {
 				var _v4 = A2(
 					$elm$core$Maybe$withDefault,
-					A3($author$project$Board$Spot, 0, false, 0),
+					A3($author$project$Backgammon$Spot, 0, false, 0),
 					A2($elm$core$Array$get, model.dice.roll2 - 1, model.board.spots));
 				var spot1 = _v4;
 				return (spot1.num_pieces > 1) && (spot1.player !== 1);
@@ -5997,7 +5997,7 @@ var $author$project$Board$noMove = function (model) {
 			var r1_p1 = function () {
 				var _v3 = A2(
 					$elm$core$Maybe$withDefault,
-					A3($author$project$Board$Spot, 0, false, 0),
+					A3($author$project$Backgammon$Spot, 0, false, 0),
 					A2($elm$core$Array$get, model.dice.roll1 - 1, model.board.spots));
 				var spot1 = _v3;
 				return (spot1.num_pieces > 1) && (spot1.player !== 1);
@@ -6005,10 +6005,10 @@ var $author$project$Board$noMove = function (model) {
 			var barred = function () {
 				var _v2 = A2(
 					$elm$core$Maybe$withDefault,
-					A3($author$project$Board$Spot, 0, false, 0),
+					A3($author$project$Backgammon$Spot, 0, false, 0),
 					A2(
 						$elm$core$Array$get,
-						$author$project$Board$bar_loc(1),
+						$author$project$Backgammon$bar_loc(1),
 						model.board.spots)).num_pieces;
 				if (!_v2) {
 					return false;
@@ -6029,7 +6029,7 @@ var $author$project$Board$noMove = function (model) {
 			var r2_p2 = function () {
 				var _v8 = A2(
 					$elm$core$Maybe$withDefault,
-					A3($author$project$Board$Spot, 0, false, 0),
+					A3($author$project$Backgammon$Spot, 0, false, 0),
 					A2($elm$core$Array$get, 24 - model.dice.roll2, model.board.spots));
 				var spot1 = _v8;
 				return (spot1.num_pieces > 1) && (spot1.player !== 2);
@@ -6037,7 +6037,7 @@ var $author$project$Board$noMove = function (model) {
 			var r1_p2 = function () {
 				var _v7 = A2(
 					$elm$core$Maybe$withDefault,
-					A3($author$project$Board$Spot, 0, false, 0),
+					A3($author$project$Backgammon$Spot, 0, false, 0),
 					A2($elm$core$Array$get, 24 - model.dice.roll1, model.board.spots));
 				var spot1 = _v7;
 				return (spot1.num_pieces > 1) && (spot1.player !== 2);
@@ -6045,10 +6045,10 @@ var $author$project$Board$noMove = function (model) {
 			var barred = function () {
 				var _v6 = A2(
 					$elm$core$Maybe$withDefault,
-					A3($author$project$Board$Spot, 0, false, 0),
+					A3($author$project$Backgammon$Spot, 0, false, 0),
 					A2(
 						$elm$core$Array$get,
-						$author$project$Board$bar_loc(2),
+						$author$project$Backgammon$bar_loc(2),
 						model.board.spots)).num_pieces;
 				if (!_v6) {
 					return false;
@@ -6071,7 +6071,7 @@ var $author$project$Board$noMove = function (model) {
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Board$switch_turn = function (n) {
+var $author$project$Backgammon$switch_turn = function (n) {
 	switch (n) {
 		case 1:
 			return 2;
@@ -6081,7 +6081,7 @@ var $author$project$Board$switch_turn = function (n) {
 			return 2;
 	}
 };
-var $author$project$Board$beared_get = F3(
+var $author$project$Backgammon$beared_get = F3(
 	function (n, xs, pl) {
 		var _v0 = A2($elm$core$Array$get, n, xs);
 		if (_v0.$ === 'Nothing') {
@@ -6096,17 +6096,17 @@ var $author$project$Board$beared_get = F3(
 			}
 		}
 	});
-var $author$project$Board$beared = F2(
+var $author$project$Backgammon$beared = F2(
 	function (m, pl) {
 		switch (pl) {
 			case 1:
-				var s7 = A3($author$project$Board$beared_get, 26, m.board.spots, 1);
-				var s6 = A3($author$project$Board$beared_get, 23, m.board.spots, 1);
-				var s5 = A3($author$project$Board$beared_get, 22, m.board.spots, 1);
-				var s4 = A3($author$project$Board$beared_get, 21, m.board.spots, 1);
-				var s3 = A3($author$project$Board$beared_get, 20, m.board.spots, 1);
-				var s2 = A3($author$project$Board$beared_get, 19, m.board.spots, 1);
-				var s1 = A3($author$project$Board$beared_get, 18, m.board.spots, 1);
+				var s7 = A3($author$project$Backgammon$beared_get, 26, m.board.spots, 1);
+				var s6 = A3($author$project$Backgammon$beared_get, 23, m.board.spots, 1);
+				var s5 = A3($author$project$Backgammon$beared_get, 22, m.board.spots, 1);
+				var s4 = A3($author$project$Backgammon$beared_get, 21, m.board.spots, 1);
+				var s3 = A3($author$project$Backgammon$beared_get, 20, m.board.spots, 1);
+				var s2 = A3($author$project$Backgammon$beared_get, 19, m.board.spots, 1);
+				var s1 = A3($author$project$Backgammon$beared_get, 18, m.board.spots, 1);
 				var tot = (((((s1 + s2) + s3) + s4) + s5) + s6) + s7;
 				if (tot === 15) {
 					return true;
@@ -6114,13 +6114,13 @@ var $author$project$Board$beared = F2(
 					return false;
 				}
 			case 2:
-				var s7 = A3($author$project$Board$beared_get, 27, m.board.spots, 2);
-				var s6 = A3($author$project$Board$beared_get, 5, m.board.spots, 2);
-				var s5 = A3($author$project$Board$beared_get, 4, m.board.spots, 2);
-				var s4 = A3($author$project$Board$beared_get, 3, m.board.spots, 2);
-				var s3 = A3($author$project$Board$beared_get, 2, m.board.spots, 2);
-				var s2 = A3($author$project$Board$beared_get, 1, m.board.spots, 2);
-				var s1 = A3($author$project$Board$beared_get, 0, m.board.spots, 2);
+				var s7 = A3($author$project$Backgammon$beared_get, 27, m.board.spots, 2);
+				var s6 = A3($author$project$Backgammon$beared_get, 5, m.board.spots, 2);
+				var s5 = A3($author$project$Backgammon$beared_get, 4, m.board.spots, 2);
+				var s4 = A3($author$project$Backgammon$beared_get, 3, m.board.spots, 2);
+				var s3 = A3($author$project$Backgammon$beared_get, 2, m.board.spots, 2);
+				var s2 = A3($author$project$Backgammon$beared_get, 1, m.board.spots, 2);
+				var s1 = A3($author$project$Backgammon$beared_get, 0, m.board.spots, 2);
 				var tot = (((((s1 + s2) + s3) + s4) + s5) + s6) + s7;
 				if (tot === 15) {
 					return true;
@@ -6131,7 +6131,7 @@ var $author$project$Board$beared = F2(
 				return false;
 		}
 	});
-var $author$project$Board$direction = function (n) {
+var $author$project$Backgammon$direction = function (n) {
 	switch (n) {
 		case 1:
 			return 1;
@@ -6141,14 +6141,14 @@ var $author$project$Board$direction = function (n) {
 			return 1;
 	}
 };
-var $author$project$Board$out_loc = function (pl) {
+var $author$project$Backgammon$out_loc = function (pl) {
 	if (pl === 1) {
 		return 26;
 	} else {
 		return 27;
 	}
 };
-var $author$project$Board$legal_move = F3(
+var $author$project$Backgammon$legal_move = F3(
 	function (m, src, dst) {
 		if (m.turn.moves_left <= 0) {
 			return false;
@@ -6161,18 +6161,18 @@ var $author$project$Board$legal_move = F3(
 				} else {
 					if ((A2(
 						$elm$core$Maybe$withDefault,
-						A3($author$project$Board$Spot, 0, false, 0),
+						A3($author$project$Backgammon$Spot, 0, false, 0),
 						A2(
 							$elm$core$Array$get,
-							$author$project$Board$bar_loc(m.turn.player),
+							$author$project$Backgammon$bar_loc(m.turn.player),
 							m.board.spots)).num_pieces > 0) && (!_Utils_eq(
 						src,
-						$author$project$Board$bar_loc(m.turn.player)))) {
+						$author$project$Backgammon$bar_loc(m.turn.player)))) {
 						return false;
 					} else {
-						if ((!A2($author$project$Board$beared, m, m.turn.player)) && _Utils_eq(
+						if ((!A2($author$project$Backgammon$beared, m, m.turn.player)) && _Utils_eq(
 							dst,
-							$author$project$Board$out_loc(m.turn.player))) {
+							$author$project$Backgammon$out_loc(m.turn.player))) {
 							return false;
 						} else {
 							var spts = m.board.spots;
@@ -6217,7 +6217,7 @@ var $author$project$Board$legal_move = F3(
 			}
 		}
 	});
-var $author$project$Board$select_dice = function (d) {
+var $author$project$Backgammon$select_dice = function (d) {
 	var _v0 = d.sel_d1;
 	if (_v0) {
 		return d.roll1;
@@ -6225,7 +6225,7 @@ var $author$project$Board$select_dice = function (d) {
 		return d.roll2;
 	}
 };
-var $author$project$Board$Board = function (spots) {
+var $author$project$Backgammon$Board = function (spots) {
 	return {spots: spots};
 };
 var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
@@ -6271,14 +6271,14 @@ var $elm$core$Array$set = F3(
 			A4($elm$core$Array$setHelp, startShift, index, value, tree),
 			tail));
 	});
-var $author$project$Board$update_vul = function (n) {
+var $author$project$Backgammon$update_vul = function (n) {
 	if (n === 1) {
 		return true;
 	} else {
 		return false;
 	}
 };
-var $author$project$Board$update_dst = F3(
+var $author$project$Backgammon$update_dst = F3(
 	function (b, dst, pl) {
 		var _v0 = A2($elm$core$Array$get, dst, b.spots);
 		if (_v0.$ === 'Nothing') {
@@ -6310,7 +6310,7 @@ var $author$project$Board$update_dst = F3(
 							{num_pieces: spot2.num_pieces + 1});
 					}
 				}();
-				return $author$project$Board$Board(
+				return $author$project$Backgammon$Board(
 					A3(
 						$elm$core$Array$set,
 						bar_index,
@@ -6324,14 +6324,14 @@ var $author$project$Board$update_dst = F3(
 					spot1,
 					{
 						player: pl,
-						vulnerable: $author$project$Board$update_vul(spot1.num_pieces)
+						vulnerable: $author$project$Backgammon$update_vul(spot1.num_pieces)
 					});
-				return $author$project$Board$Board(
+				return $author$project$Backgammon$Board(
 					A3($elm$core$Array$set, dst, spot2, b.spots));
 			}
 		}
 	});
-var $author$project$Board$update_src = F2(
+var $author$project$Backgammon$update_src = F2(
 	function (b, src) {
 		var _v0 = A2($elm$core$Array$get, src, b.spots);
 		if (_v0.$ === 'Nothing') {
@@ -6344,25 +6344,25 @@ var $author$project$Board$update_src = F2(
 			var spot2 = _Utils_update(
 				spot1,
 				{
-					vulnerable: $author$project$Board$update_vul(spot1.num_pieces)
+					vulnerable: $author$project$Backgammon$update_vul(spot1.num_pieces)
 				});
-			return $author$project$Board$Board(
+			return $author$project$Backgammon$Board(
 				A3($elm$core$Array$set, src, spot2, b.spots));
 		}
 	});
-var $author$project$Board$update_board = F2(
+var $author$project$Backgammon$update_board = F2(
 	function (mod, n) {
-		if (((n + ($author$project$Board$direction(mod.turn.player) * $author$project$Board$select_dice(mod.dice))) < 0) && ((n !== 25) && A2($author$project$Board$beared, mod, mod.turn.player))) {
+		if (((n + ($author$project$Backgammon$direction(mod.turn.player) * $author$project$Backgammon$select_dice(mod.dice))) < 0) && ((n !== 25) && A2($author$project$Backgammon$beared, mod, mod.turn.player))) {
 			return A3(
-				$author$project$Board$update_dst,
-				A2($author$project$Board$update_src, mod.board, n),
+				$author$project$Backgammon$update_dst,
+				A2($author$project$Backgammon$update_src, mod.board, n),
 				27,
 				mod.turn.player);
 		} else {
-			if (((n + ($author$project$Board$direction(mod.turn.player) * $author$project$Board$select_dice(mod.dice))) > 23) && ((n !== 24) && A2($author$project$Board$beared, mod, mod.turn.player))) {
+			if (((n + ($author$project$Backgammon$direction(mod.turn.player) * $author$project$Backgammon$select_dice(mod.dice))) > 23) && ((n !== 24) && A2($author$project$Backgammon$beared, mod, mod.turn.player))) {
 				return A3(
-					$author$project$Board$update_dst,
-					A2($author$project$Board$update_src, mod.board, n),
+					$author$project$Backgammon$update_dst,
+					A2($author$project$Backgammon$update_src, mod.board, n),
 					26,
 					mod.turn.player);
 			} else {
@@ -6370,53 +6370,53 @@ var $author$project$Board$update_board = F2(
 					switch (n) {
 						case 24:
 							return A3(
-								$author$project$Board$legal_move,
+								$author$project$Backgammon$legal_move,
 								mod,
 								n,
-								$author$project$Board$select_dice(mod.dice) - 1);
+								$author$project$Backgammon$select_dice(mod.dice) - 1);
 						case 25:
 							return A3(
-								$author$project$Board$legal_move,
+								$author$project$Backgammon$legal_move,
 								mod,
 								n,
-								(n - 1) + ($author$project$Board$direction(mod.turn.player) * $author$project$Board$select_dice(mod.dice)));
+								(n - 1) + ($author$project$Backgammon$direction(mod.turn.player) * $author$project$Backgammon$select_dice(mod.dice)));
 						default:
 							return A3(
-								$author$project$Board$legal_move,
+								$author$project$Backgammon$legal_move,
 								mod,
 								n,
-								n + ($author$project$Board$direction(mod.turn.player) * $author$project$Board$select_dice(mod.dice)));
+								n + ($author$project$Backgammon$direction(mod.turn.player) * $author$project$Backgammon$select_dice(mod.dice)));
 					}
 				}();
 				if (!legal) {
 					return mod.board;
 				} else {
-					var src = A2($author$project$Board$update_src, mod.board, n);
+					var src = A2($author$project$Backgammon$update_src, mod.board, n);
 					switch (n) {
 						case 24:
 							return A3(
-								$author$project$Board$update_dst,
+								$author$project$Backgammon$update_dst,
 								src,
-								$author$project$Board$select_dice(mod.dice) - 1,
+								$author$project$Backgammon$select_dice(mod.dice) - 1,
 								mod.turn.player);
 						case 25:
 							return A3(
-								$author$project$Board$update_dst,
+								$author$project$Backgammon$update_dst,
 								src,
-								(n - 1) + ($author$project$Board$direction(mod.turn.player) * $author$project$Board$select_dice(mod.dice)),
+								(n - 1) + ($author$project$Backgammon$direction(mod.turn.player) * $author$project$Backgammon$select_dice(mod.dice)),
 								mod.turn.player);
 						default:
 							return A3(
-								$author$project$Board$update_dst,
+								$author$project$Backgammon$update_dst,
 								src,
-								n + ($author$project$Board$direction(mod.turn.player) * $author$project$Board$select_dice(mod.dice)),
+								n + ($author$project$Backgammon$direction(mod.turn.player) * $author$project$Backgammon$select_dice(mod.dice)),
 								mod.turn.player);
 					}
 				}
 			}
 		}
 	});
-var $author$project$Board$update = F2(
+var $author$project$Backgammon$update = F2(
 	function (msg, model) {
 		update:
 		while (true) {
@@ -6504,13 +6504,13 @@ var $author$project$Board$update = F2(
 						{dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: tmp_sc.p1 + p1won, p2: tmp_sc.p2 + p2won});
 					return ((!p1won) && (!p2won)) ? _Utils_Tuple2(model, $elm$core$Platform$Cmd$none) : _Utils_Tuple2(
 						_Utils_update(
-							$author$project$Board$initModel,
+							$author$project$Backgammon$initModel,
 							{score: sco}),
-						A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll));
+						A2($elm$random$Random$generate, $author$project$Backgammon$Upd_dice, $author$project$Backgammon$dice_roll));
 				default:
 					var n = msg.a;
 					if (_Utils_eq(n, -10)) {
-						if ((!model.turn.moves_left) || $author$project$Board$noMove(model)) {
+						if ((!model.turn.moves_left) || $author$project$Backgammon$noMove(model)) {
 							var sc = model.score;
 							return _Utils_Tuple2(
 								_Utils_update(
@@ -6520,12 +6520,12 @@ var $author$project$Board$update = F2(
 											sc,
 											{new_double: false}),
 										turn: A3(
-											$author$project$Board$Turn,
+											$author$project$Backgammon$Turn,
 											2,
 											false,
-											$author$project$Board$switch_turn(model.turn.player))
+											$author$project$Backgammon$switch_turn(model.turn.player))
 									}),
-								A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll));
+								A2($elm$random$Random$generate, $author$project$Backgammon$Upd_dice, $author$project$Backgammon$dice_roll));
 						} else {
 							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 						}
@@ -6578,34 +6578,34 @@ var $author$project$Board$update = F2(
 									if (_Utils_eq(n, -31)) {
 										return ((model.turn.player === 1) || ((model.turn.player === 2) && model.score.new_double)) ? (model.score.new_double ? _Utils_Tuple2(
 											_Utils_update(
-												$author$project$Board$initModel,
+												$author$project$Backgammon$initModel,
 												{
 													score: {dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: model.score.p1, p2: model.score.p2 + ((model.score.doubled_val / 2) | 0)}
 												}),
-											A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll)) : _Utils_Tuple2(
+											A2($elm$random$Random$generate, $author$project$Backgammon$Upd_dice, $author$project$Backgammon$dice_roll)) : _Utils_Tuple2(
 											_Utils_update(
-												$author$project$Board$initModel,
+												$author$project$Backgammon$initModel,
 												{
 													score: {dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: model.score.p1, p2: model.score.p2 + model.score.doubled_val}
 												}),
-											A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll))) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+											A2($elm$random$Random$generate, $author$project$Backgammon$Upd_dice, $author$project$Backgammon$dice_roll))) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 									} else {
 										if (_Utils_eq(n, -32)) {
 											return ((model.turn.player === 2) || ((model.turn.player === 1) && model.score.new_double)) ? (model.score.new_double ? _Utils_Tuple2(
 												_Utils_update(
-													$author$project$Board$initModel,
+													$author$project$Backgammon$initModel,
 													{
 														score: {dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: model.score.p1 + ((model.score.doubled_val / 2) | 0), p2: model.score.p2}
 													}),
-												A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll)) : _Utils_Tuple2(
+												A2($elm$random$Random$generate, $author$project$Backgammon$Upd_dice, $author$project$Backgammon$dice_roll)) : _Utils_Tuple2(
 												_Utils_update(
-													$author$project$Board$initModel,
+													$author$project$Backgammon$initModel,
 													{
 														score: {dbl_p1_ctrl: 0, doubled_val: 1, new_double: false, p1: model.score.p1 + model.score.doubled_val, p2: model.score.p2}
 													}),
-												A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll))) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+												A2($elm$random$Random$generate, $author$project$Backgammon$Upd_dice, $author$project$Backgammon$dice_roll))) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 										} else {
-											if ($author$project$Board$noMove(model)) {
+											if ($author$project$Backgammon$noMove(model)) {
 												var trn = model.turn;
 												return A2(
 													$elm$core$Debug$log,
@@ -6631,12 +6631,12 @@ var $author$project$Board$update = F2(
 														return m_dice.sel_d1;
 													}
 												}();
-												var brd = A2($author$project$Board$update_board, model, n);
+												var brd = A2($author$project$Backgammon$update_board, model, n);
 												var legal = !_Utils_eq(brd, model.board);
 												if (!legal) {
 													return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 												} else {
-													var $temp$msg = $author$project$Board$Upd_score,
+													var $temp$msg = $author$project$Backgammon$Upd_score,
 														$temp$model = _Utils_update(
 														model,
 														{
@@ -6662,7 +6662,7 @@ var $author$project$Board$update = F2(
 			}
 		}
 	});
-var $author$project$Board$ClickedOn = function (a) {
+var $author$project$Backgammon$ClickedOn = function (a) {
 	return {$: 'ClickedOn', a: a};
 };
 var $timjs$elm_collage$Collage$Text$SmallCaps = {$: 'SmallCaps'};
@@ -6792,7 +6792,7 @@ var $timjs$elm_collage$Collage$styled = function (style) {
 		$timjs$elm_collage$Collage$Core$Shape(style));
 };
 var $timjs$elm_collage$Collage$thick = 4.0;
-var $author$project$Board$renderOffBlack = function (cnt) {
+var $author$project$Backgammon$renderOffBlack = function (cnt) {
 	return (cnt > 0) ? A2(
 		$elm$core$List$cons,
 		A2(
@@ -6807,9 +6807,9 @@ var $author$project$Board$renderOffBlack = function (cnt) {
 						$timjs$elm_collage$Collage$thick,
 						$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$blue))),
 				$timjs$elm_collage$Collage$circle(40))),
-		$author$project$Board$renderOffBlack(cnt - 1)) : _List_Nil;
+		$author$project$Backgammon$renderOffBlack(cnt - 1)) : _List_Nil;
 };
-var $author$project$Board$renderOffBlue = function (cnt) {
+var $author$project$Backgammon$renderOffBlue = function (cnt) {
 	return (cnt > 0) ? A2(
 		$elm$core$List$cons,
 		A2(
@@ -6824,7 +6824,7 @@ var $author$project$Board$renderOffBlue = function (cnt) {
 						$timjs$elm_collage$Collage$thick,
 						$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
 				$timjs$elm_collage$Collage$circle(40))),
-		$author$project$Board$renderOffBlue(cnt - 1)) : _List_Nil;
+		$author$project$Backgammon$renderOffBlue(cnt - 1)) : _List_Nil;
 };
 var $timjs$elm_collage$Collage$Core$Text = F2(
 	function (a, b) {
@@ -6870,7 +6870,7 @@ var $timjs$elm_collage$Collage$scale = F2(
 	});
 var $timjs$elm_collage$Collage$Core$Transparent = {$: 'Transparent'};
 var $timjs$elm_collage$Collage$transparent = $timjs$elm_collage$Collage$Core$Transparent;
-var $author$project$Board$selectedCursor = F3(
+var $author$project$Backgammon$selectedCursor = F3(
 	function (d1Sel, playerDir, moves) {
 		if (!moves) {
 			return A2(
@@ -6940,7 +6940,7 @@ var $timjs$elm_collage$Collage$filled = function (fill) {
 	return $timjs$elm_collage$Collage$styled(
 		_Utils_Tuple2(fill, $timjs$elm_collage$Collage$invisible));
 };
-var $author$project$Board$makeNPieces = F3(
+var $author$project$Backgammon$makeNPieces = F3(
 	function (clr, spot, cnt) {
 		if (!cnt) {
 			return _List_Nil;
@@ -6952,7 +6952,7 @@ var $author$project$Board$makeNPieces = F3(
 						$elm$core$List$cons,
 						A2(
 							$timjs$elm_collage$Collage$Events$onClick,
-							$author$project$Board$ClickedOn(spot - 1),
+							$author$project$Backgammon$ClickedOn(spot - 1),
 							A2(
 								$timjs$elm_collage$Collage$shift,
 								_Utils_Tuple2(640 - ((spot - 1) * 105), 380 - ((cnt - 1) * 80)),
@@ -6960,13 +6960,13 @@ var $author$project$Board$makeNPieces = F3(
 									$timjs$elm_collage$Collage$filled,
 									$timjs$elm_collage$Collage$uniform(clr),
 									$timjs$elm_collage$Collage$circle(40)))),
-						A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+						A3($author$project$Backgammon$makeNPieces, clr, spot, cnt - 1));
 				case 'EQ':
 					return A2(
 						$elm$core$List$cons,
 						A2(
 							$timjs$elm_collage$Collage$Events$onClick,
-							$author$project$Board$ClickedOn(spot - 1),
+							$author$project$Backgammon$ClickedOn(spot - 1),
 							A2(
 								$timjs$elm_collage$Collage$shift,
 								_Utils_Tuple2(640 - ((spot - 1) * 105), 380 - ((cnt - 1) * 80)),
@@ -6974,7 +6974,7 @@ var $author$project$Board$makeNPieces = F3(
 									$timjs$elm_collage$Collage$filled,
 									$timjs$elm_collage$Collage$uniform(clr),
 									$timjs$elm_collage$Collage$circle(40)))),
-						A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+						A3($author$project$Backgammon$makeNPieces, clr, spot, cnt - 1));
 				default:
 					var _v2 = A2($elm$core$Basics$compare, 12, spot);
 					switch (_v2.$) {
@@ -6983,7 +6983,7 @@ var $author$project$Board$makeNPieces = F3(
 								$elm$core$List$cons,
 								A2(
 									$timjs$elm_collage$Collage$Events$onClick,
-									$author$project$Board$ClickedOn(spot - 1),
+									$author$project$Backgammon$ClickedOn(spot - 1),
 									A2(
 										$timjs$elm_collage$Collage$shift,
 										_Utils_Tuple2((-115) - ((spot - 7) * 105), 380 - ((cnt - 1) * 80)),
@@ -6991,13 +6991,13 @@ var $author$project$Board$makeNPieces = F3(
 											$timjs$elm_collage$Collage$filled,
 											$timjs$elm_collage$Collage$uniform(clr),
 											$timjs$elm_collage$Collage$circle(40)))),
-								A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+								A3($author$project$Backgammon$makeNPieces, clr, spot, cnt - 1));
 						case 'EQ':
 							return A2(
 								$elm$core$List$cons,
 								A2(
 									$timjs$elm_collage$Collage$Events$onClick,
-									$author$project$Board$ClickedOn(spot - 1),
+									$author$project$Backgammon$ClickedOn(spot - 1),
 									A2(
 										$timjs$elm_collage$Collage$shift,
 										_Utils_Tuple2((-115) - ((spot - 7) * 105), 380 - ((cnt - 1) * 80)),
@@ -7005,7 +7005,7 @@ var $author$project$Board$makeNPieces = F3(
 											$timjs$elm_collage$Collage$filled,
 											$timjs$elm_collage$Collage$uniform(clr),
 											$timjs$elm_collage$Collage$circle(40)))),
-								A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+								A3($author$project$Backgammon$makeNPieces, clr, spot, cnt - 1));
 						default:
 							var _v3 = A2($elm$core$Basics$compare, 18, spot);
 							switch (_v3.$) {
@@ -7014,7 +7014,7 @@ var $author$project$Board$makeNPieces = F3(
 										$elm$core$List$cons,
 										A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(spot - 1),
+											$author$project$Backgammon$ClickedOn(spot - 1),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2((-640) + ((spot - 13) * 105), (-380) + ((cnt - 1) * 80)),
@@ -7022,13 +7022,13 @@ var $author$project$Board$makeNPieces = F3(
 													$timjs$elm_collage$Collage$filled,
 													$timjs$elm_collage$Collage$uniform(clr),
 													$timjs$elm_collage$Collage$circle(40)))),
-										A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+										A3($author$project$Backgammon$makeNPieces, clr, spot, cnt - 1));
 								case 'EQ':
 									return A2(
 										$elm$core$List$cons,
 										A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(spot - 1),
+											$author$project$Backgammon$ClickedOn(spot - 1),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2((-640) + ((spot - 13) * 105), (-380) + ((cnt - 1) * 80)),
@@ -7036,7 +7036,7 @@ var $author$project$Board$makeNPieces = F3(
 													$timjs$elm_collage$Collage$filled,
 													$timjs$elm_collage$Collage$uniform(clr),
 													$timjs$elm_collage$Collage$circle(40)))),
-										A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+										A3($author$project$Backgammon$makeNPieces, clr, spot, cnt - 1));
 								default:
 									var _v4 = A2($elm$core$Basics$compare, 24, spot);
 									switch (_v4.$) {
@@ -7045,7 +7045,7 @@ var $author$project$Board$makeNPieces = F3(
 												$elm$core$List$cons,
 												A2(
 													$timjs$elm_collage$Collage$Events$onClick,
-													$author$project$Board$ClickedOn(spot - 1),
+													$author$project$Backgammon$ClickedOn(spot - 1),
 													A2(
 														$timjs$elm_collage$Collage$shift,
 														_Utils_Tuple2(115 + ((spot - 19) * 105), (-380) + ((cnt - 1) * 80)),
@@ -7053,13 +7053,13 @@ var $author$project$Board$makeNPieces = F3(
 															$timjs$elm_collage$Collage$filled,
 															$timjs$elm_collage$Collage$uniform(clr),
 															$timjs$elm_collage$Collage$circle(40)))),
-												A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+												A3($author$project$Backgammon$makeNPieces, clr, spot, cnt - 1));
 										case 'EQ':
 											return A2(
 												$elm$core$List$cons,
 												A2(
 													$timjs$elm_collage$Collage$Events$onClick,
-													$author$project$Board$ClickedOn(spot - 1),
+													$author$project$Backgammon$ClickedOn(spot - 1),
 													A2(
 														$timjs$elm_collage$Collage$shift,
 														_Utils_Tuple2(115 + ((spot - 19) * 105), (-380) + ((cnt - 1) * 80)),
@@ -7067,13 +7067,13 @@ var $author$project$Board$makeNPieces = F3(
 															$timjs$elm_collage$Collage$filled,
 															$timjs$elm_collage$Collage$uniform(clr),
 															$timjs$elm_collage$Collage$circle(40)))),
-												A3($author$project$Board$makeNPieces, clr, spot, cnt - 1));
+												A3($author$project$Backgammon$makeNPieces, clr, spot, cnt - 1));
 										default:
 											return (spot === 25) ? A2(
 												$elm$core$List$cons,
 												A2(
 													$timjs$elm_collage$Collage$Events$onClick,
-													$author$project$Board$ClickedOn(spot - 1),
+													$author$project$Backgammon$ClickedOn(spot - 1),
 													A2(
 														$timjs$elm_collage$Collage$shift,
 														_Utils_Tuple2(0, 100 + ((cnt - 1) * 80)),
@@ -7081,11 +7081,11 @@ var $author$project$Board$makeNPieces = F3(
 															$timjs$elm_collage$Collage$filled,
 															$timjs$elm_collage$Collage$uniform(clr),
 															$timjs$elm_collage$Collage$circle(40)))),
-												A3($author$project$Board$makeNPieces, clr, spot, cnt - 1)) : ((spot === 26) ? A2(
+												A3($author$project$Backgammon$makeNPieces, clr, spot, cnt - 1)) : ((spot === 26) ? A2(
 												$elm$core$List$cons,
 												A2(
 													$timjs$elm_collage$Collage$Events$onClick,
-													$author$project$Board$ClickedOn(spot - 1),
+													$author$project$Backgammon$ClickedOn(spot - 1),
 													A2(
 														$timjs$elm_collage$Collage$shift,
 														_Utils_Tuple2(0, (-100) - ((cnt - 1) * 80)),
@@ -7093,14 +7093,14 @@ var $author$project$Board$makeNPieces = F3(
 															$timjs$elm_collage$Collage$filled,
 															$timjs$elm_collage$Collage$uniform(clr),
 															$timjs$elm_collage$Collage$circle(40)))),
-												A3($author$project$Board$makeNPieces, clr, spot, cnt - 1)) : _List_Nil);
+												A3($author$project$Backgammon$makeNPieces, clr, spot, cnt - 1)) : _List_Nil);
 									}
 							}
 					}
 			}
 		}
 	});
-var $author$project$Board$spotsToPieces = F2(
+var $author$project$Backgammon$spotsToPieces = F2(
 	function (num, spots) {
 		spotsToPieces:
 		while (true) {
@@ -7112,12 +7112,12 @@ var $author$project$Board$spotsToPieces = F2(
 					switch (_v1.$) {
 						case 'GT':
 							return _Utils_ap(
-								A3($author$project$Board$makeNPieces, $avh4$elm_color$Color$black, num, p.num_pieces),
-								A2($author$project$Board$spotsToPieces, num + 1, ps));
+								A3($author$project$Backgammon$makeNPieces, $avh4$elm_color$Color$black, num, p.num_pieces),
+								A2($author$project$Backgammon$spotsToPieces, num + 1, ps));
 						case 'EQ':
 							return _Utils_ap(
-								A3($author$project$Board$makeNPieces, $avh4$elm_color$Color$black, num, p.num_pieces),
-								A2($author$project$Board$spotsToPieces, num + 1, ps));
+								A3($author$project$Backgammon$makeNPieces, $avh4$elm_color$Color$black, num, p.num_pieces),
+								A2($author$project$Backgammon$spotsToPieces, num + 1, ps));
 						default:
 							return _List_Nil;
 					}
@@ -7127,12 +7127,12 @@ var $author$project$Board$spotsToPieces = F2(
 						switch (_v2.$) {
 							case 'GT':
 								return _Utils_ap(
-									A3($author$project$Board$makeNPieces, $avh4$elm_color$Color$blue, num, p.num_pieces),
-									A2($author$project$Board$spotsToPieces, num + 1, ps));
+									A3($author$project$Backgammon$makeNPieces, $avh4$elm_color$Color$blue, num, p.num_pieces),
+									A2($author$project$Backgammon$spotsToPieces, num + 1, ps));
 							case 'EQ':
 								return _Utils_ap(
-									A3($author$project$Board$makeNPieces, $avh4$elm_color$Color$blue, num, p.num_pieces),
-									A2($author$project$Board$spotsToPieces, num + 1, ps));
+									A3($author$project$Backgammon$makeNPieces, $avh4$elm_color$Color$blue, num, p.num_pieces),
+									A2($author$project$Backgammon$spotsToPieces, num + 1, ps));
 							default:
 								return _List_Nil;
 						}
@@ -8062,7 +8062,7 @@ var $timjs$elm_collage$Collage$Render$svg = function (collage) {
 			$timjs$elm_collage$Collage$Layout$height(collage)),
 		A2($timjs$elm_collage$Collage$Layout$align, $timjs$elm_collage$Collage$Layout$topLeft, collage));
 };
-var $author$project$Board$turnCursor = function (player) {
+var $author$project$Backgammon$turnCursor = function (player) {
 	return (player === 1) ? A2(
 		$timjs$elm_collage$Collage$shift,
 		_Utils_Tuple2(-820, -240),
@@ -8088,7 +8088,7 @@ var $author$project$Board$turnCursor = function (player) {
 			A3($timjs$elm_collage$Collage$roundedRectangle, 200, 100, 5)));
 };
 var $avh4$elm_color$Color$white = A4($avh4$elm_color$Color$RgbaSpace, 255 / 255, 255 / 255, 255 / 255, 1.0);
-var $author$project$Board$view = function (model) {
+var $author$project$Backgammon$view = function (model) {
 	var styles = _List_fromArray(
 		[
 			_Utils_Tuple2('position', 'fixed'),
@@ -8098,17 +8098,17 @@ var $author$project$Board$view = function (model) {
 		]);
 	var canvas = _Utils_ap(
 		A2(
-			$author$project$Board$spotsToPieces,
+			$author$project$Backgammon$spotsToPieces,
 			1,
 			$elm$core$Array$toList(model.board.spots)),
 		_Utils_ap(
-			$author$project$Board$renderOffBlack(
+			$author$project$Backgammon$renderOffBlack(
 				A2(
 					$elm$core$Maybe$withDefault,
 					{num_pieces: 0, player: 0, vulnerable: false},
 					A2($elm$core$Array$get, 26, model.board.spots)).num_pieces),
 			_Utils_ap(
-				$author$project$Board$renderOffBlue(
+				$author$project$Backgammon$renderOffBlue(
 					A2(
 						$elm$core$Maybe$withDefault,
 						{num_pieces: 0, player: 0, vulnerable: false},
@@ -8235,18 +8235,18 @@ var $author$project$Board$view = function (model) {
 						_List_fromArray(
 							[
 								A3(
-								$author$project$Board$selectedCursor,
+								$author$project$Backgammon$selectedCursor,
 								model.dice.sel_d1,
-								$author$project$Board$direction(model.turn.player),
+								$author$project$Backgammon$direction(model.turn.player),
 								model.turn.moves_left),
-								$author$project$Board$turnCursor(model.turn.player),
+								$author$project$Backgammon$turnCursor(model.turn.player),
 								A2(
 								$timjs$elm_collage$Collage$Events$onClick,
-								$author$project$Board$ClickedOn(-11),
+								$author$project$Backgammon$ClickedOn(-11),
 								A2(
 									$timjs$elm_collage$Collage$shift,
 									_Utils_Tuple2(
-										$author$project$Board$direction(model.turn.player) * 272,
+										$author$project$Backgammon$direction(model.turn.player) * 272,
 										0),
 									$timjs$elm_collage$Collage$rendered(
 										A2(
@@ -8265,11 +8265,11 @@ var $author$project$Board$view = function (model) {
 															$elm$core$String$fromInt(model.dice.roll1))))))))),
 								A2(
 								$timjs$elm_collage$Collage$Events$onClick,
-								$author$project$Board$ClickedOn(-11),
+								$author$project$Backgammon$ClickedOn(-11),
 								A2(
 									$timjs$elm_collage$Collage$shift,
 									_Utils_Tuple2(
-										$author$project$Board$direction(model.turn.player) * 272,
+										$author$project$Backgammon$direction(model.turn.player) * 272,
 										0),
 									A2(
 										$timjs$elm_collage$Collage$styled,
@@ -8282,11 +8282,11 @@ var $author$project$Board$view = function (model) {
 										A3($timjs$elm_collage$Collage$roundedRectangle, 60, 60, 5)))),
 								A2(
 								$timjs$elm_collage$Collage$Events$onClick,
-								$author$project$Board$ClickedOn(-12),
+								$author$project$Backgammon$ClickedOn(-12),
 								A2(
 									$timjs$elm_collage$Collage$shift,
 									_Utils_Tuple2(
-										$author$project$Board$direction(model.turn.player) * 482,
+										$author$project$Backgammon$direction(model.turn.player) * 482,
 										0),
 									$timjs$elm_collage$Collage$rendered(
 										A2(
@@ -8305,11 +8305,11 @@ var $author$project$Board$view = function (model) {
 															$elm$core$String$fromInt(model.dice.roll2))))))))),
 								A2(
 								$timjs$elm_collage$Collage$Events$onClick,
-								$author$project$Board$ClickedOn(-12),
+								$author$project$Backgammon$ClickedOn(-12),
 								A2(
 									$timjs$elm_collage$Collage$shift,
 									_Utils_Tuple2(
-										$author$project$Board$direction(model.turn.player) * 482,
+										$author$project$Backgammon$direction(model.turn.player) * 482,
 										0),
 									A2(
 										$timjs$elm_collage$Collage$styled,
@@ -8322,7 +8322,7 @@ var $author$project$Board$view = function (model) {
 										A3($timjs$elm_collage$Collage$roundedRectangle, 60, 60, 5)))),
 								A2(
 								$timjs$elm_collage$Collage$Events$onClick,
-								$author$project$Board$ClickedOn(-10),
+								$author$project$Backgammon$ClickedOn(-10),
 								A2(
 									$timjs$elm_collage$Collage$shift,
 									_Utils_Tuple2(-820, 0),
@@ -8342,7 +8342,7 @@ var $author$project$Board$view = function (model) {
 														$timjs$elm_collage$Collage$Text$fromString('Roll')))))))),
 								A2(
 								$timjs$elm_collage$Collage$Events$onClick,
-								$author$project$Board$ClickedOn(-10),
+								$author$project$Backgammon$ClickedOn(-10),
 								A2(
 									$timjs$elm_collage$Collage$shift,
 									_Utils_Tuple2(-820, 0),
@@ -8361,7 +8361,7 @@ var $author$project$Board$view = function (model) {
 								[
 									A2(
 									$timjs$elm_collage$Collage$Events$onClick,
-									$author$project$Board$ClickedOn(-20),
+									$author$project$Backgammon$ClickedOn(-20),
 									A2(
 										$timjs$elm_collage$Collage$shift,
 										_Utils_Tuple2(0, 360 * model.score.dbl_p1_ctrl),
@@ -8382,7 +8382,7 @@ var $author$project$Board$view = function (model) {
 																$elm$core$String$fromInt(model.score.doubled_val))))))))),
 									A2(
 									$timjs$elm_collage$Collage$Events$onClick,
-									$author$project$Board$ClickedOn(-20),
+									$author$project$Backgammon$ClickedOn(-20),
 									A2(
 										$timjs$elm_collage$Collage$shift,
 										_Utils_Tuple2(0, 360 * model.score.dbl_p1_ctrl),
@@ -8401,7 +8401,7 @@ var $author$project$Board$view = function (model) {
 									[
 										A2(
 										$timjs$elm_collage$Collage$Events$onClick,
-										$author$project$Board$ClickedOn(-31),
+										$author$project$Backgammon$ClickedOn(-31),
 										A2(
 											$timjs$elm_collage$Collage$shift,
 											_Utils_Tuple2(-820, -120),
@@ -8421,7 +8421,7 @@ var $author$project$Board$view = function (model) {
 																$timjs$elm_collage$Collage$Text$fromString('Forfeit')))))))),
 										A2(
 										$timjs$elm_collage$Collage$Events$onClick,
-										$author$project$Board$ClickedOn(-31),
+										$author$project$Backgammon$ClickedOn(-31),
 										A2(
 											$timjs$elm_collage$Collage$shift,
 											_Utils_Tuple2(-820, -120),
@@ -8436,7 +8436,7 @@ var $author$project$Board$view = function (model) {
 												A3($timjs$elm_collage$Collage$roundedRectangle, 145, 55, 3)))),
 										A2(
 										$timjs$elm_collage$Collage$Events$onClick,
-										$author$project$Board$ClickedOn(-32),
+										$author$project$Backgammon$ClickedOn(-32),
 										A2(
 											$timjs$elm_collage$Collage$shift,
 											_Utils_Tuple2(-820, 120),
@@ -8456,7 +8456,7 @@ var $author$project$Board$view = function (model) {
 																$timjs$elm_collage$Collage$Text$fromString('Forfeit')))))))),
 										A2(
 										$timjs$elm_collage$Collage$Events$onClick,
-										$author$project$Board$ClickedOn(-32),
+										$author$project$Backgammon$ClickedOn(-32),
 										A2(
 											$timjs$elm_collage$Collage$shift,
 											_Utils_Tuple2(-820, 120),
@@ -8475,7 +8475,7 @@ var $author$project$Board$view = function (model) {
 										[
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(0),
+											$author$project$Backgammon$ClickedOn(0),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(640, 220),
@@ -8490,7 +8490,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(1),
+											$author$project$Backgammon$ClickedOn(1),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(535, 220),
@@ -8505,7 +8505,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(2),
+											$author$project$Backgammon$ClickedOn(2),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(430, 220),
@@ -8520,7 +8520,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(3),
+											$author$project$Backgammon$ClickedOn(3),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(325, 220),
@@ -8535,7 +8535,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(4),
+											$author$project$Backgammon$ClickedOn(4),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(220, 220),
@@ -8550,7 +8550,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(5),
+											$author$project$Backgammon$ClickedOn(5),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(115, 220),
@@ -8565,7 +8565,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(11),
+											$author$project$Backgammon$ClickedOn(11),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-640, 220),
@@ -8580,7 +8580,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(10),
+											$author$project$Backgammon$ClickedOn(10),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-535, 220),
@@ -8595,7 +8595,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(9),
+											$author$project$Backgammon$ClickedOn(9),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-430, 220),
@@ -8610,7 +8610,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(8),
+											$author$project$Backgammon$ClickedOn(8),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-325, 220),
@@ -8625,7 +8625,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(7),
+											$author$project$Backgammon$ClickedOn(7),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-220, 220),
@@ -8640,7 +8640,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(6),
+											$author$project$Backgammon$ClickedOn(6),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-115, 220),
@@ -8655,7 +8655,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(12),
+											$author$project$Backgammon$ClickedOn(12),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-640, -220),
@@ -8670,7 +8670,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(13),
+											$author$project$Backgammon$ClickedOn(13),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-535, -220),
@@ -8685,7 +8685,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(14),
+											$author$project$Backgammon$ClickedOn(14),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-430, -220),
@@ -8700,7 +8700,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(15),
+											$author$project$Backgammon$ClickedOn(15),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-325, -220),
@@ -8715,7 +8715,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(16),
+											$author$project$Backgammon$ClickedOn(16),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-220, -220),
@@ -8730,7 +8730,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(19),
+											$author$project$Backgammon$ClickedOn(19),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(-115, -220),
@@ -8745,7 +8745,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(23),
+											$author$project$Backgammon$ClickedOn(23),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(640, -220),
@@ -8760,7 +8760,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(22),
+											$author$project$Backgammon$ClickedOn(22),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(535, -220),
@@ -8775,7 +8775,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(21),
+											$author$project$Backgammon$ClickedOn(21),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(430, -220),
@@ -8790,7 +8790,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(20),
+											$author$project$Backgammon$ClickedOn(20),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(325, -220),
@@ -8805,7 +8805,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(19),
+											$author$project$Backgammon$ClickedOn(19),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(220, -220),
@@ -8820,7 +8820,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$ellipse, 45, 200)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(18),
+											$author$project$Backgammon$ClickedOn(18),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(115, -220),
@@ -8838,7 +8838,7 @@ var $author$project$Board$view = function (model) {
 										[
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(24),
+											$author$project$Backgammon$ClickedOn(24),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(0, 220),
@@ -8853,7 +8853,7 @@ var $author$project$Board$view = function (model) {
 													A2($timjs$elm_collage$Collage$rectangle, 100, 440)))),
 											A2(
 											$timjs$elm_collage$Collage$Events$onClick,
-											$author$project$Board$ClickedOn(25),
+											$author$project$Backgammon$ClickedOn(25),
 											A2(
 												$timjs$elm_collage$Collage$shift,
 												_Utils_Tuple2(0, -220),
@@ -8894,12 +8894,12 @@ var $author$project$Board$view = function (model) {
 		_List_fromArray(
 			[display]));
 };
-var $author$project$Board$main = $elm$browser$Browser$element(
-	{init: $author$project$Board$init, subscriptions: $author$project$Board$subscriptions, update: $author$project$Board$update, view: $author$project$Board$view});
-_Platform_export({'Board':{'init':$author$project$Board$main(
+var $author$project$Backgammon$main = $elm$browser$Browser$element(
+	{init: $author$project$Backgammon$init, subscriptions: $author$project$Backgammon$subscriptions, update: $author$project$Backgammon$update, view: $author$project$Backgammon$view});
+_Platform_export({'Backgammon':{'init':$author$project$Backgammon$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
 
-  var app = Elm.Board.init({ node: document.getElementById("elm") });
+  var app = Elm.Backgammon.init({ node: document.getElementById("elm") });
 }
 catch (e)
 {
