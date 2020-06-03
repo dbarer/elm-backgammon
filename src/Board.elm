@@ -183,7 +183,7 @@ initModel ={
    dice = { roll1 = 3, roll2 = 1, sel_d1 = True, double = False},
    bar = {whites = 0, blacks = 0},
    players = [{player_num = 1, beared = False, barred = False}, {player_num = 2, beared = False, barred = False}],
-   score = {p1 = 0, p2 = 0, doubled_val = 64, dbl_p1_ctrl = 0},
+   score = {p1 = 0, p2 = 0, doubled_val = 1, dbl_p1_ctrl = 0},
    turn = {moves_left = 2, d1_used = False, player = 1}
   }
 
@@ -483,6 +483,18 @@ update msg model =
             (model, Cmd.none)
         else
           (model, Cmd.none)
+      else if (n==(-31)) then
+        --p1Forfeit
+        if (model.turn.player == 1) then
+          ({initModel | score = {p1 = model.score.p1, p2 = (model.score.p2 + model.score.doubled_val), doubled_val = 1, dbl_p1_ctrl = 0}}, Cmd.none)
+        else
+          (model, Cmd.none)
+      else if (n==(-32)) then
+        --p2Forfeit
+        if (model.turn.player == 2) then
+          ({initModel | score = {p1 = (model.score.p1 + model.score.doubled_val), p2 = model.score.p2, doubled_val = 1, dbl_p1_ctrl = 0}}, Cmd.none)
+        else
+          (model, Cmd.none)
       else
         let
           barred = ispbar model -- (p_access model).barred
@@ -618,10 +630,15 @@ view model =
            (Collage.roundedRectangle 60 60 5|> styled (uniform white, solid thick (uniform black))|> shift (toFloat ((direction (model.turn.player))*482), toFloat 0) |> onClick (ClickedOn -12)),
            -- roll button
            ((Text.fromString ("Roll"))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift (toFloat -820, toFloat 0) |> onClick (ClickedOn (-10))),
-           (Collage.roundedRectangle 115 75 3|> styled (uniform white, solid thick (uniform black))|> shift (toFloat -820, toFloat 0) |> onClick (ClickedOn -10))]
+           (Collage.roundedRectangle 115 95 3|> styled (uniform white, solid thick (uniform black))|> shift (toFloat -820, toFloat 0) |> onClick (ClickedOn -10))]
         --doubling cube
         ++[((Text.fromString (String.fromInt model.score.doubled_val))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> Text.size 38 |> rendered |> shift (toFloat 0, toFloat (360*model.score.dbl_p1_ctrl)) |> onClick (ClickedOn (-20))),
             (Collage.square 85|> styled (uniform white, solid thick (uniform black))|> shift (toFloat 0, toFloat (360*model.score.dbl_p1_ctrl)) |> onClick (ClickedOn (-20)))]
+        --forfeit buttons
+        ++[((Text.fromString ("Forfeit"))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift (toFloat -820, toFloat -120) |> onClick (ClickedOn (-31))),
+           (Collage.roundedRectangle 145 55 3|> styled (uniform white, solid thin (uniform red))|> shift (toFloat -820, toFloat -120) |> onClick (ClickedOn -31)),
+           ((Text.fromString ("Forfeit"))|> Text.size Text.large |> Text.color Color.blue |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift (toFloat -820, toFloat 120) |> onClick (ClickedOn (-32))),
+           (Collage.roundedRectangle 145 55 3|> styled (uniform white, solid thin (uniform red))|> shift (toFloat -820, toFloat 120) |> onClick (ClickedOn -32))]
         --q1
         ++[(Collage.ellipse 45 200|> styled (uniform red, solid thick (uniform black))|> shift (640, 220)|> onClick (ClickedOn 0)),
         (Collage.ellipse 45 200|> styled (uniform white, solid thick (uniform black))|> shift (535, 220)|> onClick (ClickedOn 1)),
