@@ -457,7 +457,10 @@ update msg model =
         else
           ({initModel | score = sco}, Cmd.none)
     ClickedOn n ->
-      if (n==(-10)) then ({model | turn =  Turn 2 False (switch_turn model.turn.player)  }, Random.generate Upd_dice dice_roll)
+      if (n==(-10)) then
+        if (model.turn.moves_left == 0) then
+          ({model | turn =  Turn 2 False (switch_turn model.turn.player)  }, Random.generate Upd_dice dice_roll)
+        else (model, Cmd.none)
       else if (n==(-11)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = True, double = model.dice.double}}, Cmd.none)
       else if (n==(-12)) then ({model | dice = { roll1 = model.dice.roll1, roll2 = model.dice.roll2, sel_d1 = False, double = model.dice.double}}, Cmd.none)
       else if (n==(-20)) then
@@ -567,20 +570,23 @@ spotsToPieces num spots =
 turnCursor : Int -> Collage Msg
 turnCursor player =
   if (player == 1) then
-    (Collage.roundedRectangle 200 100 5|> styled (transparent, solid thick (uniform green))|> shift (toFloat -820, toFloat -240))
+    (Collage.roundedRectangle 200 100 5|> styled (transparent, solid thin (uniform black))|> shift (toFloat -820, toFloat -240))
   else
-    (Collage.roundedRectangle 200 100 5|> styled (transparent, solid thick (uniform green))|> shift (toFloat -820, toFloat 240))
+    (Collage.roundedRectangle 200 100 5|> styled (transparent, solid thin (uniform blue))|> shift (toFloat -820, toFloat 240))
 
-selectedCursor : Bool -> Int -> Collage Msg
-selectedCursor d1Sel playerDir =
-  let
-    d1Pos = 272
-    d2Pos = 482
-  in
-    if d1Sel then
-      (Collage.roundedRectangle 62 62 5|> styled (transparent, solid thick (uniform green))|> shift ((toFloat (playerDir)*d1Pos), toFloat 0))
-    else
-      (Collage.roundedRectangle 62 62 5|> styled (transparent, solid thick (uniform green))|> shift ((toFloat (playerDir)*d2Pos), toFloat 0))
+selectedCursor : Bool -> Int -> Int -> Collage Msg
+selectedCursor d1Sel playerDir moves=
+  if (moves==0) then
+    (Collage.roundedRectangle 117 97 3|> styled (transparent, solid thick (uniform green))|> shift (toFloat -820, toFloat 0))
+  else
+    let
+      d1Pos = 272
+      d2Pos = 482
+    in
+      if d1Sel then
+        (Collage.roundedRectangle 62 62 5|> styled (transparent, solid thick (uniform green))|> shift ((toFloat (playerDir)*d1Pos), toFloat 0))
+      else
+        (Collage.roundedRectangle 62 62 5|> styled (transparent, solid thick (uniform green))|> shift ((toFloat (playerDir)*d2Pos), toFloat 0))
 
 renderOffBlack : Int -> List (Collage Msg)
 renderOffBlack cnt =
@@ -621,7 +627,7 @@ view model =
            ((Text.fromString (String.fromInt (model.score.p2)))|> Text.size Text.large |> Text.color Color.blue |> Text.shape Text.SmallCaps |> Text.size 32 |> rendered |> shift (toFloat -820, toFloat 220))]
         --dice
         ++[-- selected window
-           selectedCursor (model.dice.sel_d1) (direction (model.turn.player)),
+           selectedCursor (model.dice.sel_d1) (direction (model.turn.player)) (model.turn.moves_left),
            turnCursor (model.turn.player),
            -- Dice
            ((Text.fromString (String.fromInt model.dice.roll1))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift ((toFloat (direction (model.turn.player))*272), toFloat 0) |> onClick (ClickedOn -11)),
@@ -630,7 +636,7 @@ view model =
            (Collage.roundedRectangle 60 60 5|> styled (uniform white, solid thick (uniform black))|> shift (toFloat ((direction (model.turn.player))*482), toFloat 0) |> onClick (ClickedOn -12)),
            -- roll button
            ((Text.fromString ("Roll"))|> Text.size Text.large |> Text.color Color.black |> Text.shape Text.SmallCaps |> Text.size 30 |> rendered |> shift (toFloat -820, toFloat 0) |> onClick (ClickedOn (-10))),
-           (Collage.roundedRectangle 115 95 3|> styled (uniform white, solid thick (uniform black))|> shift (toFloat -820, toFloat 0) |> onClick (ClickedOn -10))]
+           (Collage.roundedRectangle 115 95 3|> styled (uniform white, solid thin (uniform white))|> shift (toFloat -820, toFloat 0) |> onClick (ClickedOn -10))]
         --doubling cube
         ++[((Text.fromString (String.fromInt model.score.doubled_val))|> Text.size Text.large |> Text.color Color.green |> Text.shape Text.SmallCaps |> Text.size 38 |> rendered |> shift (toFloat 0, toFloat (360*model.score.dbl_p1_ctrl)) |> onClick (ClickedOn (-20))),
             (Collage.square 85|> styled (uniform white, solid thick (uniform black))|> shift (toFloat 0, toFloat (360*model.score.dbl_p1_ctrl)) |> onClick (ClickedOn (-20)))]

@@ -6430,7 +6430,7 @@ var $author$project$Board$update = F2(
 				default:
 					var n = msg.a;
 					if (_Utils_eq(n, -10)) {
-						return _Utils_Tuple2(
+						return (!model.turn.moves_left) ? _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
@@ -6440,7 +6440,7 @@ var $author$project$Board$update = F2(
 										false,
 										$author$project$Board$switch_turn(model.turn.player))
 								}),
-							A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll));
+							A2($elm$random$Random$generate, $author$project$Board$Upd_dice, $author$project$Board$dice_roll)) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
 						if (_Utils_eq(n, -11)) {
 							return _Utils_Tuple2(
@@ -6755,33 +6755,48 @@ var $timjs$elm_collage$Collage$scale = F2(
 	});
 var $timjs$elm_collage$Collage$Core$Transparent = {$: 'Transparent'};
 var $timjs$elm_collage$Collage$transparent = $timjs$elm_collage$Collage$Core$Transparent;
-var $author$project$Board$selectedCursor = F2(
-	function (d1Sel, playerDir) {
-		var d2Pos = 482;
-		var d1Pos = 272;
-		return d1Sel ? A2(
-			$timjs$elm_collage$Collage$shift,
-			_Utils_Tuple2(playerDir * d1Pos, 0),
-			A2(
-				$timjs$elm_collage$Collage$styled,
-				_Utils_Tuple2(
-					$timjs$elm_collage$Collage$transparent,
-					A2(
-						$timjs$elm_collage$Collage$solid,
-						$timjs$elm_collage$Collage$thick,
-						$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$green))),
-				A3($timjs$elm_collage$Collage$roundedRectangle, 62, 62, 5))) : A2(
-			$timjs$elm_collage$Collage$shift,
-			_Utils_Tuple2(playerDir * d2Pos, 0),
-			A2(
-				$timjs$elm_collage$Collage$styled,
-				_Utils_Tuple2(
-					$timjs$elm_collage$Collage$transparent,
-					A2(
-						$timjs$elm_collage$Collage$solid,
-						$timjs$elm_collage$Collage$thick,
-						$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$green))),
-				A3($timjs$elm_collage$Collage$roundedRectangle, 62, 62, 5)));
+var $author$project$Board$selectedCursor = F3(
+	function (d1Sel, playerDir, moves) {
+		if (!moves) {
+			return A2(
+				$timjs$elm_collage$Collage$shift,
+				_Utils_Tuple2(-820, 0),
+				A2(
+					$timjs$elm_collage$Collage$styled,
+					_Utils_Tuple2(
+						$timjs$elm_collage$Collage$transparent,
+						A2(
+							$timjs$elm_collage$Collage$solid,
+							$timjs$elm_collage$Collage$thick,
+							$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$green))),
+					A3($timjs$elm_collage$Collage$roundedRectangle, 117, 97, 3)));
+		} else {
+			var d2Pos = 482;
+			var d1Pos = 272;
+			return d1Sel ? A2(
+				$timjs$elm_collage$Collage$shift,
+				_Utils_Tuple2(playerDir * d1Pos, 0),
+				A2(
+					$timjs$elm_collage$Collage$styled,
+					_Utils_Tuple2(
+						$timjs$elm_collage$Collage$transparent,
+						A2(
+							$timjs$elm_collage$Collage$solid,
+							$timjs$elm_collage$Collage$thick,
+							$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$green))),
+					A3($timjs$elm_collage$Collage$roundedRectangle, 62, 62, 5))) : A2(
+				$timjs$elm_collage$Collage$shift,
+				_Utils_Tuple2(playerDir * d2Pos, 0),
+				A2(
+					$timjs$elm_collage$Collage$styled,
+					_Utils_Tuple2(
+						$timjs$elm_collage$Collage$transparent,
+						A2(
+							$timjs$elm_collage$Collage$solid,
+							$timjs$elm_collage$Collage$thick,
+							$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$green))),
+					A3($timjs$elm_collage$Collage$roundedRectangle, 62, 62, 5)));
+		}
 	});
 var $timjs$elm_collage$Collage$Text$shape = F2(
 	function (newshape, _v0) {
@@ -7942,8 +7957,8 @@ var $author$project$Board$turnCursor = function (player) {
 				$timjs$elm_collage$Collage$transparent,
 				A2(
 					$timjs$elm_collage$Collage$solid,
-					$timjs$elm_collage$Collage$thick,
-					$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$green))),
+					$timjs$elm_collage$Collage$thin,
+					$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
 			A3($timjs$elm_collage$Collage$roundedRectangle, 200, 100, 5))) : A2(
 		$timjs$elm_collage$Collage$shift,
 		_Utils_Tuple2(-820, 240),
@@ -7953,8 +7968,8 @@ var $author$project$Board$turnCursor = function (player) {
 				$timjs$elm_collage$Collage$transparent,
 				A2(
 					$timjs$elm_collage$Collage$solid,
-					$timjs$elm_collage$Collage$thick,
-					$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$green))),
+					$timjs$elm_collage$Collage$thin,
+					$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$blue))),
 			A3($timjs$elm_collage$Collage$roundedRectangle, 200, 100, 5)));
 };
 var $avh4$elm_color$Color$white = A4($avh4$elm_color$Color$RgbaSpace, 255 / 255, 255 / 255, 255 / 255, 1.0);
@@ -8104,10 +8119,11 @@ var $author$project$Board$view = function (model) {
 					_Utils_ap(
 						_List_fromArray(
 							[
-								A2(
+								A3(
 								$author$project$Board$selectedCursor,
 								model.dice.sel_d1,
-								$author$project$Board$direction(model.turn.player)),
+								$author$project$Board$direction(model.turn.player),
+								model.turn.moves_left),
 								$author$project$Board$turnCursor(model.turn.player),
 								A2(
 								$timjs$elm_collage$Collage$Events$onClick,
@@ -8221,8 +8237,8 @@ var $author$project$Board$view = function (model) {
 											$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white),
 											A2(
 												$timjs$elm_collage$Collage$solid,
-												$timjs$elm_collage$Collage$thick,
-												$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$black))),
+												$timjs$elm_collage$Collage$thin,
+												$timjs$elm_collage$Collage$uniform($avh4$elm_color$Color$white))),
 										A3($timjs$elm_collage$Collage$roundedRectangle, 115, 95, 3))))
 							]),
 						_Utils_ap(
